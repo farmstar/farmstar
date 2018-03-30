@@ -17,7 +17,8 @@ Feed 10 billion people.
 - Some farms here in Australia are bigger than entire countries, mate.
 
 ### Mockup
-![Mockup v1.1](/docs/media/Mockup v1.1.jpg?raw=true)
+
+![Logo v1.0](/docs/media/Mockup v1.1.jpg)
 
 ### Goals
 *See TODO for specific project goals*
