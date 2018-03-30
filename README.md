@@ -3,6 +3,8 @@ Farm management system.
 
 *NOTE: This is an aspirational side project, migration onto github is in progress.*
 
+![Logo v1.0](/docs/media/logojoy-01.1.png?raw=true)
+
 ## Vision
 Feed 10 billion people.
 
