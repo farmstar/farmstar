@@ -18,7 +18,7 @@ Feed 10 billion people.
 
 ### Mockup
 
-![Mockup v1.1](/docs/media/Mockup v1.1.png?raw=true)
+![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
 
 ### Goals
 *See TODO for specific project goals*
