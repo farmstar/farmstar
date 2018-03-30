@@ -53,3 +53,21 @@ Feed 10 billion people.
 - Primarily developed for RasberyPi.
 - Ad-hoc peer-to-peer communication.
 
+### Design
+- Primarily written in python
+- WebUI interface
+- Initially using django for web framework
+- Seperate backend and frontend 
+- Backend processes and logs data to sqlite
+- Serve live position and other real-time data to simple .json http GET
+- Django frontend for local and remote WebUI
+- Leaflet mapping with custom tiles and layers.
+- Primary buttons and info overlayed ontop of map
+- Boot to kiosk mode sort of thing.
+- Consideration for multiple GPS receivers, on spray booms and whatever.
+- Plug and play add on hardware such as additional sensors / IO / stereo output / additional screens / whatever
+
+
+
+
+
