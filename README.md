@@ -16,6 +16,9 @@ Feed 10 billion people.
 - Fully autonomous tractors are kinda expensive.
 - Some farms here in Australia are bigger than entire countries, mate.
 
+### Mockup
+![Logo v1.0](farmstar/docs/media/Mockup v1.1.jpg?raw=true)
+
 ### Goals
 *See TODO for specific project goals*
 
