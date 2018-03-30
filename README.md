@@ -18,7 +18,7 @@ Feed 10 billion people.
 
 ### Mockup
 
-![Logo v1.0](/docs/media/Mockup v1.1.jpg)
+![Mockup v1.1](farmstar/docs/media/Mockup v1.1.png?raw=true)
 
 ### Goals
 *See TODO for specific project goals*
