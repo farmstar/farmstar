@@ -1,0 +1,2 @@
+# farmstar
+Farm management system.
