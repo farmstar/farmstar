@@ -1,3 +1,6 @@
+Tidy this TODO
+
+
 *See TODO in backend/frontend
 
 Make whole thing modular
@@ -10,3 +13,6 @@ do a requirements.txt
 scripts to do complete install from scratch (pip modules and python detection...)
 force python3
 run other scripts as python3 (autodetect environment)
+
+
+Test Edit
