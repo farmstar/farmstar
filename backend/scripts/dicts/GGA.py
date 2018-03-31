@@ -1,3 +1,7 @@
+'''
+Blank GGA dictionary for storing processed nmea data
+'''
+
 GGA = {'String':'',
        'Sentence':'',
        'Fix':'',

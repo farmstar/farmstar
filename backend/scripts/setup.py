@@ -4,18 +4,26 @@ import com
 import serial
 import nmea
 from multiprocessing import Process
+import fs_time
+
 
 
 '''
-#1 - Get GPS com port
-#2 - Get GPS time
-#3 - Get NTP time (try)
-#4 - Compare times
-#5 - sync time if necessary
-#6 - set path variables
-#7 - create backup folder
-#8 - backup config
-#9 - backup database(s)
+Farmstar backend setup (v2.0)
+Gathers info to save to config and sets up databases:
+(need to verify time before commencing)
+
+#01 - Scan for active serial ports
+#02 - Scans serial ports for GPS data
+#03 - Get GPS time
+#04 - Get local time
+#05 - Test for NTP server
+#06 - sync time if necessary
+#07 - create backup folder
+#08 - backup any existing config
+#09 - backup any existing database(s)
+#10 - ...
+#11 - profit?
 
 
 
@@ -23,6 +31,8 @@ from multiprocessing import Process
 
 
 '''
+
+#Config dictionary
 config = {'comports':[],
           'ser': None,
           'line': '',
@@ -31,38 +41,22 @@ config = {'comports':[],
           
 
 def getCom():
-    comports = com.Ports()
-    config
-
+    '''
+    Runs 'com.py' script
+    Returns list of active GPS serial ports
+    Returns None if no valid gps data received
+    '''
+    comports = com.Ports().valid
+    if comports == []:
+        config['comports'] = None
+    else:
+        config['comports'] = comports
      
 
-def readSerial():
-    global ser
-    ser = None
-    global line
-    line = ''
-    comport = comports[0]
-    while True:
-        try:
-            if(ser == None or line == ''):
-                ser = serial.Serial(comport,9600,timeout=1.5)
-            line = ser.readline().decode("utf-8") # Read the entire string
-        except:
-            if(not(ser == None)):
-                ser.close()
-                ser = None
-                comstatus = "Disconnecting"
-            comstatus = str("No Connection to %s" % (comport))
-            time.sleep(2)
-
-
-def gpsTime():
-    while True:
-        sentence = readSerial()
-        if sentence[0] == 'GGA':
-            fixtime = sentence[1]
-            
-
+def syncTime():
+    comports = config['comports']
+    print("Running time sync...")
+    fs_time.run(comports)
 
 
 def setPaths():
@@ -106,7 +100,7 @@ def configBackup():
 
 def run():
     getCom()
-    readSerial()
+    syncTime()
 
 
 if __name__ == '__main__':

@@ -6,10 +6,25 @@ import sqlite3
 import datetime
 
 
+'''
+Farmstar backend run script
+Completes self tests
+Runs setup if necessary
+Launches GPS logging once tests pass
+'''
+
 #Import Config
 def getConfig():
+    project_root = os.path.abspath(os.path.join('..\..'))
     try:
-        import config
+        if os.path.exists(os.path.join(project_root, 'data')):
+            print("Launched from backend")
+            sys.path.append(project_root)
+            from data import config
+        elif os.path.exists('data'):
+            print("Launched from project root")
+            sys.path.append(os.path.dirname(os.path.join('..')))
+            import data.config
     except:
         return(False)
 
@@ -22,6 +37,7 @@ def getDB():
     except:
         return(False)
 
+
 #Database file check
 def DBfile():
     try:
@@ -29,7 +45,6 @@ def DBfile():
             return(False)
     except:
         return(False)
-
 
 
 #Serial Port config
@@ -40,6 +55,7 @@ def getComport():
     except:
         return(False)
 
+
 #Serial port connection
 def testComport():    
     try:
@@ -47,6 +63,7 @@ def testComport():
         ser.readline().decode("utf-8")
     except:
         return(False)
+
 
 #Test the GPS data stream using the checksum value
 def serialTest():
@@ -113,7 +130,9 @@ def main():
 def runSetup():
     print("Initiating setup.....")
     try:
+        import setup
         setup.run()
+        #import gps
     except:
         print("Run setup.....[Fail]")
         
