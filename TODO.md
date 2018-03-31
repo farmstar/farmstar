@@ -1,18 +1,11 @@
-Tidy this TODO
+Farmstar TODO
+
+See TODO in backend/ and frontend/
+
+- [x] Fix start.py
+- [x] Put argparse into start.py to parse django binding IP and port (python start.py --h)
+- [x] .bat to launch start.py with args (default starts both backend and frontend)
+- [x] .bat to launch backend only
+- [ ] detect if laucnhed from console and display warning or re-launch itself through console
 
 
-*See TODO in backend/frontend
-
-Make whole thing modular
-Make it more "pythony" 
-Include the if __name__ = __main__ or whatever in the files
-
-Organise project to upload to github
-Do proper readme and TODO
-do a requirements.txt
-scripts to do complete install from scratch (pip modules and python detection...)
-force python3
-run other scripts as python3 (autodetect environment)
-
-
-Test Edit
