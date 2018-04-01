@@ -5,71 +5,53 @@ from dicts import *
 import fs_checksum
 
 
-GGA = GGA.GGA
-
-
 '''
 Farmstar nmea data parser
 Converts GPS data into a list of dictionaries
 Returns the dictionary list
 '''
 
-#parse raw nmea data (one line at a time):
-def parse(line):
-    #Remove newline
-    stripped = line.rstrip('\n\r')
-    #Split into a list format
-    sentence = stripped.split(",")
-    #Get the sentence type
-    NMEA = sentence[0][3:]
-     if NMEA == 'GGA':
-        GGA(sentence)  
-    else:
-        pass
 
-def GGA(sentence):
-        #Send to checksum parser
-        check = fs_checksum.parse(line)
-        #Count the total/good/bad strings
-        GGA['Count_total'] += 1
-        if check == True:
-            GGA['Count_good'] += 1
+class parse():
+
+    #parse raw nmea data (one line at a time)
+    #Currently only GGA
+    
+    def __init__(self, line=None):
+        self.GGA = GGA.GGA
+        self.line = line
+        self.fix = 000000
+    
+        if self.line == None:
+            print("No data recieved")
         else:
-           GGA['Count_bad'] += 1
-        #Timezone calculations and conversions:
-        #(Assuming local time is precise)
-        #(I know this is messy)
-        #Get UTC timezone object:
-        from_zone = tz.tzutc()
-        #Get local timezone object:
-        to_zone = tz.tzlocal()
-        #Convert GPS fix to a datetime object:
-        fixtime = datetime.strptime(sentence[1], '%H%M%S')
-        #Formats the GPS fix time:
-        fixutc = fixtime.strftime('%H:%M:%S')
-        #Get the local time in UTC:
-        localutc = datetime.utcnow()
-        #Get the local date converted to UTC:
-        #(UTC date will be different to local date at certain times)
-        utcdate = localutc.strftime('%Y-%m-%d')
-        #Prepend local utc date to the gps fix time:
-        gpsutcdatetime = str("%s %s" % (utcdate, fixutc))
-        #Convert back to a datetime object
-        fixutcdatetime = datetime.strptime(gpsutcdatetime, '%Y-%m-%d %H:%M:%S')
-        #Tell datetime it is in the UTC timezone
-        gpsdatetime = fixutcdatetime.replace(tzinfo=from_zone)
-        #Convert the GPS fix datetime from UTC to local timezone
-        gpslocal = gpsdatetime.astimezone(to_zone)
-        #Extract the time only
-        fixlocal = gpslocal.strftime('%H:%M:%S')
-        #Get local datetime
-        localdatetime = datetime.now()
-        #Tell datetime the local timezone
-        localdatetimezone = localdatetime.replace(tzinfo=to_zone)
-        #Local time to compare with GPS fix time
-        localtime = localdatetime.strftime('%H:%M:%S')
-        #Calculate the fix age
-        age = (localdatetimezone-gpslocal).total_seconds()
+            #Remove newline
+            self.stripped = self.line.rstrip('\n\r')
+            #Split into a list format
+            self.sentence = self.stripped.split(",")
+            #Get the sentence type
+            self.NMEA = self.sentence[0][3:]
+            if self.NMEA == 'GGA':
+                self.parseGGA()
+            else:
+                pass
+
+    def parseTime(self, fix=None):
+        #Takes a 6 digit gps fix integer and saves time values to a dictionary
+        self.TIME = TIME.TIME
+        
+
+    def parseGGA(self):
+        #Send to checksum parser
+        self.check = fs_checksum.parse(self.line)
+        #Count the total/good/bad strings
+        self.GGA['Count_total'] += 1
+        if self.check == True:
+            self.GGA['Count_good'] += 1
+        else:
+            self.GGA['Count_bad'] += 1
+            
+
         
         GGA['Fix'] = fixlocal
         GGA['Local_time'] = localtime
