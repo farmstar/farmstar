@@ -15,24 +15,23 @@ Uses local device OS date and timezone
 Returns a dictionary (SPACETIME) regardless if a gps fix is given
 
 TODO:
-Remove unnessary info from dictionary
-Calculate time since last GPS update
+Remove unnessary info from dictionary, perhaps, maybe?
 '''
 
 class parse():
 
     def __init__(self, fix=000000):
-        self.fix = fix
-        print("Fix: {}".format(self.fix))
         self.SPACETIME = SPACE.TIME
+        self.fix = '{num:06d}'.format(num=int(fix))
         self.gpsTime()
 
     def gpsTime(self):
+
         #Timezone calculations and conversions:
         #Requires local device date to be correct (gps only supplies time)
 
         #Previous fix value (last iteration)
-        self.SPACETIME['prevfix'] = self.SPACETIME['fix']
+        self.SPACETIME['prevfix'] = '{num:06d}'.format(num=int(self.SPACETIME['fix']))
        
         #GPS fix time raw 6 digit integer
         self.SPACETIME['fix'] = self.fix
@@ -45,10 +44,10 @@ class parse():
 
         #Local timezone name
         self.SPACETIME['tzLocal'] = tzlocal.get_localzone().zone
-       
+
         #Convert GPS fix to a datetime object:
-        self.SPACETIME['fixtime'] = datetime.strptime(self.fix, '%H%M%S')
-        
+        self.SPACETIME['fixtime'] = datetime.strptime('{num:06d}'.format(num=int(self.SPACETIME['fix'])), '%H%M%S')
+
         #Formats the GPS fix time:
         self.SPACETIME['fixutc'] = self.SPACETIME['fixtime'].strftime('%H:%M:%S')
        
@@ -85,24 +84,16 @@ class parse():
         
         #Calculate the local and gps fix time difference
         self.SPACETIME['timediff'] = (self.SPACETIME['localdatetimezone']-self.SPACETIME['gpslocal']).total_seconds()
-
-        for i in self.SPACETIME:
-            print('{} : {}'.format(i,self.SPACETIME[i]))
-
-'''           
+         
         #Calculate the fix age (time since last fix)
-        if self.fix > self.prevfix:
-            age = 0
-        elif self.fix == self.prevfix:
-            age = self.fix - self.prevfix
-        elif self.fix < self.prevfix:
+        if self.SPACETIME['fix'] > self.SPACETIME['prevfix']:
+            self.SPACETIME['age'] = 0
+        elif self.SPACETIME['fix'] == self.SPACETIME['prevfix']:
+            self.SPACETIME['age'] += 1
+        elif self.SPACETIME['fix'] < self.SPACETIME['prevfix']:
             print("It's bigger on the inside!?")
         else:
             print("I got no ting bro")
-'''
-
-            
-
 
 
 
@@ -163,9 +154,11 @@ class main():
         self.sentence = self.stripped.split(",")
         self.NMEA = self.sentence[0][3:]
         if self.NMEA == 'GGA':
-            print("GGA")
             self.fix = self.sentence[1]
-            parse(self.fix)
+            self.timelord = parse(self.fix).SPACETIME
+            for i in self.timelord:
+                print('{} : {}'.format(i,self.timelord[i]))
+
 
 
 

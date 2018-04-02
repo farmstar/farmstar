@@ -5,13 +5,11 @@ import nmea
 
 
 '''
-Farmstar time lord module
-Processes GPS, NTP and local times 
-optional 6 digit time value HHMMSS
-optional comport to check for GPS data
-optional nmea sentence
-optional ntp server ip
-Returns a bunch of time values and status in dictionary format
+INCOMPLETE
+Farmstar time sync module
+gets time from NTP, GPS, local device
+Compares and syncronises local device time
+(In theory)
 '''
 
 class lord():
