@@ -3,7 +3,7 @@ Blank TIME dictionary for storing processed time data
 '''
 
 TIME = {'prevfix':'',
-        'fix':'',
+        'fix':000000,
         'from_zone':'',
         'to_zone':'',
         'tzLocal':'',
@@ -20,5 +20,5 @@ TIME = {'prevfix':'',
         'localdatetimezone':'',
         'localtime':'',
         'timediff':'',
-        'age':'',
+        'age':0,
         }
