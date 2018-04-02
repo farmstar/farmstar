@@ -4,11 +4,13 @@ from datetime import datetime
 from dicts import *
 import fs_checksum
 import fs_time
+import serial
 
 
 '''
 Farmstar nmea data parser
 Converts GPS data into a bunch of dictionaries
+Creates a dictionary of all dictionaries 
 '''
 
 
@@ -34,6 +36,7 @@ class parse():
                 self.parseGGA()
             else:
                 pass
+            self.packALL()
         
 
     def parseGGA(self):
@@ -55,6 +58,7 @@ class parse():
         self.GGA['Sentence'] = self.sentence[0][1:]
         self.GGA['Check'] = self.check
 
+        #Latitude conversion
         self.lat = self.sentence[2][:2].lstrip('0') + "." + "%.7s" % str(float(self.sentence[2][2:])*1.0/60.0).lstrip("0.")
         if self.sentence[3] == 'S':
             self.GGA['Latitude'] = float(self.lat)*-1
@@ -62,14 +66,73 @@ class parse():
             self.GGA['Latitude'] = float(self.lat)
         self.GGA['North/South'] = self.sentence[3]
 
+        #Lonitude conversion
         self.lon = self.sentence[4][:3].lstrip('0') + "." + "%.7s" % str(float(self.sentence[4][3:])*1.0/60.0).lstrip("0.")
         self.GGA['Longitude'] = float(self.lon)
         self.GGA['East/West'] = self.sentence[5]
 
+    def packALL(self):
+        #SPACETIME not packing for some reason
+        self.GPS = {'SPACETIME':{},'GGA':self.GGA}
+        pass
+
+class main():
+    #main for testing this module
+
+    def __init__(self, comports=''):
+        self.comports = comports
+        self.line = ''
+        self.ser = None
+
+
+        if self.comports == '':
+            self.getPorts()
+        else:
+            self.run()
+
+
+    def getPorts(self):
+        print("Scanning for active ports...")
+        self.comports = com.Ports().valid
+        if self.comports == []:
+            print("Unable to find valid gps port")
+            self.comport = None
+        else:
+            self.comport = self.comports[0]
+            self.run()
+    
+
+    def run(self):
+        self.comport = self.comports[0]
+        while True:
+            try:
+                if(self.ser == None or self.line == ''):
+                    self.ser = serial.Serial(self.comport,9600,timeout=1.5)
+                self.line = self.ser.readline().decode("utf-8") # Read the entire string
+                try:
+                    self.GPS = parse(self.line).GPS
+                    self.GGA = self.GPS['GGA']
+                    
+                    for i in self.GGA:
+                        print('{} : {}'.format(i,self.GGA[i]))
+                except:
+                    print("NMEA Parse Fail")
+            except:
+                if(not(self.ser == None)):
+                    self.ser.close()
+                    self.ser = None
+                    print("Disconnecting")
+                print("No Connection to {}".format(self.comport))
+                time.sleep(2)
+
+
+
+
+
+
 if __name__ == '__main__':
-    #Script test
-    GGA = parse('$GPGGA,024106,3321.9308,S,11537.59819,E,1,21,1.0,-8.313,M,-30.9,M,,*63').GGA
-    for i in GGA:
-        print('{} : {}'.format(i,GGA[i]))
+    #Uses com module to scan for valid ports if a port isn't specified
+    #main()
+    main(['COM5'])
 
 
