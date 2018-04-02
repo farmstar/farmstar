@@ -3,12 +3,12 @@ from dateutil import tz
 from datetime import datetime
 from dicts import *
 import fs_checksum
+import fs_time
 
 
 '''
 Farmstar nmea data parser
-Converts GPS data into a list of dictionaries
-Returns the dictionary list
+Converts GPS data into a bunch of dictionaries
 '''
 
 
@@ -20,7 +20,6 @@ class parse():
     def __init__(self, line=None):
         self.GGA = GGA.GGA
         self.line = line
-        self.fix = 000000
     
         if self.line == None:
             print("No data recieved")
@@ -35,10 +34,6 @@ class parse():
                 self.parseGGA()
             else:
                 pass
-
-    def parseTime(self, fix=None):
-        #Takes a 6 digit gps fix integer and saves time values to a dictionary
-        self.TIME = TIME.TIME
         
 
     def parseGGA(self):
@@ -50,31 +45,31 @@ class parse():
             self.GGA['Count_good'] += 1
         else:
             self.GGA['Count_bad'] += 1
-            
 
+        self.SPACETIME = fs_time.parse(self.sentence[1]).SPACETIME  
         
-        GGA['Fix'] = fixlocal
-        GGA['Local_time'] = localtime
-        GGA['Age'] = age
-        
-        GGA['String'] = stripped
-        GGA['Sentence'] = sentence[0][1:]
-        GGA['Checksum'] = hex_checksum
-        GGA['Calculated'] = hex_data
-        GGA['Check'] = check
+        self.GGA['Fix'] = self.SPACETIME['fixlocal']
+        self.GGA['Local_time'] = self.SPACETIME['localtime']
+        self.GGA['Age'] = self.SPACETIME['age']    
+        self.GGA['String'] = self.stripped
+        self.GGA['Sentence'] = self.sentence[0][1:]
+        self.GGA['Check'] = self.check
 
-        lat = sentence[2][:2].lstrip('0') + "." + "%.7s" % str(float(sentence[2][2:])*1.0/60.0).lstrip("0.")
-        if sentence[3] == 'S':
-            GGA['Latitude'] = float(lat)*-1
+        self.lat = self.sentence[2][:2].lstrip('0') + "." + "%.7s" % str(float(self.sentence[2][2:])*1.0/60.0).lstrip("0.")
+        if self.sentence[3] == 'S':
+            self.GGA['Latitude'] = float(self.lat)*-1
         else:
-            GGA['Latitude'] = float(lat)
-        GGA['North/South'] = sentence[3]
+            self.GGA['Latitude'] = float(self.lat)
+        self.GGA['North/South'] = self.sentence[3]
 
-        lon = sentence[4][:3].lstrip('0') + "." + "%.7s" % str(float(sentence[4][3:])*1.0/60.0).lstrip("0.")
-        GGA['Longitude'] = float(lon)
-        GGA['East/West'] = sentence[5]
+        self.lon = self.sentence[4][:3].lstrip('0') + "." + "%.7s" % str(float(self.sentence[4][3:])*1.0/60.0).lstrip("0.")
+        self.GGA['Longitude'] = float(self.lon)
+        self.GGA['East/West'] = self.sentence[5]
 
 if __name__ == '__main__':
-    parse('$GPGGA,024106,3321.9308,S,11537.59819,E,1,21,1.0,-8.313,M,-30.9,M,,*63')
+    #Script test
+    GGA = parse('$GPGGA,024106,3321.9308,S,11537.59819,E,1,21,1.0,-8.313,M,-30.9,M,,*63').GGA
+    for i in GGA:
+        print('{} : {}'.format(i,GGA[i]))
 
 
