@@ -20,7 +20,9 @@ class display():
     def __init__(self,GPS={}):
         self.GPS = GPS
         self.GGA = self.GPS['GGA']
-        
+        self.screen()
+
+        '''
         try:
             stdscr = curses.initscr()
         except:
@@ -32,20 +34,24 @@ class display():
                              stderr=subprocess.STDOUT)
         except:
             raise Exception("Failed to start server")    
-        
+        '''
 
 
 
 
 
-    def screen():
+    def screen(self):
+        global stdscr
         stdscr.clear()
-        stdscr.addstr(1,1,"   COM Port: %s" % (comport))    
+        '''
+        stdscr.addstr(1,1,"   COM Port: %s" % (comport))
+        
         stdscr.addstr(2,1," COM Status: %s" % (comstatus))
         stdscr.addstr(2,1,"   Database: %s" % (comstatus))
         
-
-        stdscr.addstr(4,1,"     String: %s" % (nmea.GGA['String']))
+        '''
+        stdscr.addstr(4,1,"     String: {}".format(self.GGA['String']))
+        '''
         stdscr.addstr(4,1,"   Sentence: %s" % (nmea.GGA['Sentence']))
         stdscr.addstr(5,1,"   Checksum: %s" % (nmea.GGA['Checksum']))
         stdscr.addstr(6,1," Calculated: %s" % (nmea.GGA['Calculated']))
@@ -59,7 +65,7 @@ class display():
         stdscr.addstr(14,1,"       Age: %s" % (nmea.GGA['Age']))
         stdscr.addstr(15,1,"  Latitude: %s %s" % (nmea.GGA['Latitude'],nmea.GGA['North/South']))
         stdscr.addstr(16,1," Longitude: %s %s" % (nmea.GGA['Longitude'], nmea.GGA['East/West']))
-        
+        '''
         stdscr.refresh()
 
         
@@ -118,5 +124,9 @@ class main():
 if __name__ == '__main__':
     #Uses com module to scan for valid ports if a port isn't specified
     #main()
+    global stdscr
+    print("Initiating screen")
+    stdscr = curses.initscr()
+    print("Running main")
     main(['COM5'])
 
