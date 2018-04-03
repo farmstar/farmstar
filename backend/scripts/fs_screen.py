@@ -1,5 +1,5 @@
 import serial
-import nmea
+import fs_nmea
 import time
 import curses
 import subprocess
@@ -19,6 +19,8 @@ class display():
 
     def __init__(self,GPS={}):
         self.GPS = GPS
+        self.STATUS = self.GPS['STATUS']
+        self.SPACETIME = self.GPS['SPACETIME']
         self.GGA = self.GPS['GGA']
         self.screen()
 
@@ -104,7 +106,7 @@ class main():
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
                 try:
-                    self.GPS = nmea.parse(self.line).GPS
+                    self.GPS = fs_nmea.parse(self.line).GPS
                     display(self.GPS)
                 except:
                     print("Display fail")

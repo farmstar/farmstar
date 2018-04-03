@@ -1,1 +1,2 @@
-__all__ = ['GGA','SPACE']
+__all__ = ['GGA','GPS',
+           'SPACE','STATUS']
