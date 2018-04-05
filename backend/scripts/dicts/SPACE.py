@@ -21,4 +21,6 @@ TIME = {'prevfix':'',
         'localtime':'',
         'timediff':'',
         'age':0,
+        'utcoffset':'',
+        'localoffset':'',
         }

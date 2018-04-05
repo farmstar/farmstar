@@ -8,7 +8,7 @@ import com
 
 '''
 Farmstar screen module
-Takes a dictionary of dictionaries with processed nmea data
+Takes a dictionary of dictionaries with processed nmea data (from fs_nmea)
 {'gga':{'fix':'012345','age':'3'},'rmc':{key:val}}
 Prints to a terminal screen statically, i.e. not scrolling
 needs to be initiated from a terminal not IDE
@@ -22,6 +22,7 @@ class display():
         self.STATUS = self.GPS['STATUS']
         self.SPACETIME = self.GPS['SPACETIME']
         self.GGA = self.GPS['GGA']
+        self.GSA = self.GPS['GSA']
         self.screen()
 
         '''
@@ -43,32 +44,51 @@ class display():
 
 
     def screen(self):
-        global stdscr
-        stdscr.clear()
-        '''
-        stdscr.addstr(1,1,"   COM Port: %s" % (comport))
-        
-        stdscr.addstr(2,1," COM Status: %s" % (comstatus))
-        stdscr.addstr(2,1,"   Database: %s" % (comstatus))
-        
-        '''
-        stdscr.addstr(4,1,"     String: {}".format(self.GGA['String']))
-        '''
-        stdscr.addstr(4,1,"   Sentence: %s" % (nmea.GGA['Sentence']))
-        stdscr.addstr(5,1,"   Checksum: %s" % (nmea.GGA['Checksum']))
-        stdscr.addstr(6,1," Calculated: %s" % (nmea.GGA['Calculated']))
-        stdscr.addstr(7,1,"      Check: %s" % (nmea.GGA['Check']))
-        stdscr.addstr(8,1,"      Total: %s" % (nmea.GGA['Count_total']))
-        stdscr.addstr(9,1,"       Good: %s" % (nmea.GGA['Count_good']))
-        stdscr.addstr(10,1,"        Bad: %s" % (nmea.GGA['Count_bad']))
 
-        stdscr.addstr(12,1,"  Last Fix: %s" % (nmea.GGA['Fix']))
-        stdscr.addstr(13,1,"Local Time: %s" % (nmea.GGA['Local_time']))
-        stdscr.addstr(14,1,"       Age: %s" % (nmea.GGA['Age']))
-        stdscr.addstr(15,1,"  Latitude: %s %s" % (nmea.GGA['Latitude'],nmea.GGA['North/South']))
-        stdscr.addstr(16,1," Longitude: %s %s" % (nmea.GGA['Longitude'], nmea.GGA['East/West']))
-        '''
-        stdscr.refresh()
+        try:
+            #Box 1
+            box1.addstr(1,1,' '*78)
+            box1.addstr(1,1,self.STATUS['string'].center(78, ' '))
+            
+            #Box 2
+            check = '{}/{} - {}'.format(self.STATUS['checksum'],self.STATUS['calculated'],self.STATUS['check'])
+            box2.addstr(1,1,str(' '*16))
+            box2.addstr(1,1,check)
+
+            #Box 3
+            errper = int(round((int(self.STATUS['count_bad'])/int(self.STATUS['count_total']))*100))
+            errors = '{}/{} - {}%'.format(self.STATUS['count_bad'],self.STATUS['count_total'],errper)
+            box3.addstr(1,1,str(' '*18))
+            box3.addstr(1,1,errors.center(18, ' '))
+
+            #Box 4
+            box4.addstr(1,1,str(' '*20))
+            box4.addstr(1,1,'Lat: {} {}'.format(self.GGA['Latitude'],self.GGA['North/South']))
+            box4.addstr(2,1,str(' '*20))
+            box4.addstr(2,1,'Lon: {} {}'.format(self.GGA['Longitude'],self.GGA['East/West']))
+            box4.addstr(3,1,str(' '*20))
+            box4.addstr(3,1,'Alt: {} {}'.format(self.GGA['Altitude'],self.GGA['Altitude_Units']))
+            box4.addstr(4,1,str(' '*20))
+            box4.addstr(4,1,'Sat: {}'.format(self.GGA['Satellites']))
+            box4.addstr(5,1,str(' '*20))
+            box4.addstr(5,1,'Qua: {} - {}'.format(self.GGA['Quality'],self.GGA['Type']))
+            box4.addstr(6,1,str(' '*20))
+            box4.addstr(6,1,'Acc: {}'.format(self.GGA['Accuracy']))
+            box4.addstr(7,1,str(' '*20))
+            box4.addstr(7,1,'Geo: {} {}'.format(self.GGA['GeoID_Height'],self.GGA['GeoID_Units']))
+            box4.addstr(8,1,str(' '*20))
+            box4.addstr(8,1,'Fix: {} UTC'.format(self.GGA['Fix']))
+            
+            
+            
+            stdscr.refresh()
+            box1.refresh()
+            box2.refresh()
+            box3.refresh()
+            box4.refresh()
+        except:
+            curses.endwin()
+            print("Screen Failed")
 
         
 
@@ -80,11 +100,11 @@ class main():
         self.line = ''
         self.ser = None
 
-
         if self.comports == '':
+            print("No serial port specified")
             self.getPorts()
-        else:
-            self.run()
+        self.initScreen()
+        self.run()
 
 
     def getPorts(self):
@@ -96,8 +116,34 @@ class main():
         else:
             self.comport = self.comports[0]
             self.run()
-    
+            
 
+    def initScreen(self):
+        global stdscr
+        global box1
+        global box2
+        global box3
+        global box4
+        
+        print("Initiating screen...")
+        stdscr = curses.initscr()
+        stdscr.border(0)
+        box1 = curses.newwin(3, 80, 1, 1)
+        box2 = curses.newwin(3, 18, 1, 81)
+        box3 = curses.newwin(3, 20, 1, 99)
+        box4 = curses.newwin(10, 22, 4, 1)
+        box1.box()
+        box2.box()
+        box3.box()
+        box4.box()
+        stdscr.addstr(0,50,"Farmstar Boiiii")
+        box1.addstr(0,40,"Sentence")
+        box2.addstr(0,5,"Checksum")
+        box3.addstr(0,7,"Errors")
+        box4.addstr(0,10,"GGA")
+        print("Stating GPS...")
+
+    
     def run(self):
         self.comport = self.comports[0]
         while True:
@@ -126,9 +172,5 @@ class main():
 if __name__ == '__main__':
     #Uses com module to scan for valid ports if a port isn't specified
     #main()
-    global stdscr
-    print("Initiating screen")
-    stdscr = curses.initscr()
-    print("Running main")
     main(['COM5'])
 

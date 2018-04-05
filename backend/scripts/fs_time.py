@@ -5,7 +5,7 @@ from dateutil import tz
 from datetime import datetime
 import tzlocal
 from dicts import *
-import fs_checksum
+
 
 
 '''
@@ -84,6 +84,12 @@ class parse():
         
         #Calculate the local and gps fix time difference
         self.SPACETIME['timediff'] = (self.SPACETIME['localdatetimezone']-self.SPACETIME['gpslocal']).total_seconds()
+
+        #UTC Offset
+        
+
+        #Local Offset
+        
          
         #Calculate the fix age (time since last fix)
         if self.SPACETIME['fix'] > self.SPACETIME['prevfix']:
