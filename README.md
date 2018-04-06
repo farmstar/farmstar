@@ -1,12 +1,12 @@
 # Farmstar
-Farm management system.
+Cost effective high precision farm management system.
 
-*NOTE: This is an aspirational side project, migration onto github is in progress.*
+*NOTE: This is a side project, we have no idea what we are doing.*
 
 ![Logo v1.0](/docs/media/logojoy-01.1.png?raw=true)
 
 ## Vision
-Feed 10 billion people.
+Help feed 10 billion people.
 
 ### Farming Industry problems
 - Expensive proprietary hardware and software in machines.
@@ -21,7 +21,7 @@ Feed 10 billion people.
 ![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
 
 ### Goals
-*See TODO for specific project goals*
+*See TODO / wiki / project board for specific project goals*
 
 #### Short Term
 - Plug and play displays
@@ -56,8 +56,9 @@ Feed 10 billion people.
 - High precision farming at the smallest possible cost.
 - Intuitive and simple as possible.
 - Versatile, work on anything with a screen.
-- Primarily developed for RasberyPi.
+- Primarily developed for RasberyPi, or other cheap hardware.
 - Ad-hoc peer-to-peer communication.
+- Swappable hardware, easily put in any machine.
 
 ### Design
 - Primarily written in python
