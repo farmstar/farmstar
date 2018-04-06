@@ -1,5 +1,5 @@
 # Farmstar
-Cost effective high precision farm management system.
+High precision farm management system.
 
 *NOTE: This is a side project, we have no idea what we are doing.*
 
