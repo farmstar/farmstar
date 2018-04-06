@@ -18,6 +18,8 @@ Help feed 10 billion people.
 
 ### Mockup
 
+*Version 1*
+
 ![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
 
 ### Goals
