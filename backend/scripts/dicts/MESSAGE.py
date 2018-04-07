@@ -1,0 +1,36 @@
+'''
+Farmstar NMEA-0183 messages dictionary.
+Retrieved from: http://freenmea.net/docs
+'''
+
+MESSAGE = {'VER':'NMEA-0183',
+           'AAM':'Waypoint Arrival Alarm',
+           'ALM':'Almanac data',
+           'APA':'Auto Pilot A',
+           'APB':'Auto Pilot B',
+           'BOD':'Bearing Origin to Destination',
+           'BWC':'Bearing using Great Circle route',
+           'DTM':'Datum being used',
+           'GGA':'Fix information',
+           'GLL':'Lat/Lon data',
+           'GRS':'GPS Range Residuals',
+           'GSA':'Overall Satellite data',
+           'GST':'GPS Pseudorange Noise Statistics',
+           'GSV':'Detailed Satellite data',
+           'MSK':'Send control for a beacon receiver',
+           'MSS':'Beacon receiver status information',
+           'RMA':'Recommended Loran data',
+           'RMB':'Recommended navigation data for gps',
+           'RMC':'Recommended minimum data for gps',
+           'RTE':'Route message',
+           'TRF':'Transit Fix Data',
+           'STN':'Multiple Data ID',
+           'VBW':'Dual Ground / Water Speed',
+           'VTG':'Vector track an Speed over the Ground',
+           'WCV':'Waypoint closure velocity (Velocity Made Good)',
+           'WPL':'Waypoint Location information',
+           'XTC':'Cross track error',
+           'XTE':'Measured cross track error',
+           'ZTG':'Zulu (UTC) time and time to go (to destination)',
+           'ZDA ':'Date and Time',
+           }

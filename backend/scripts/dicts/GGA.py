@@ -4,6 +4,9 @@ Blank GGA dictionary for storing processed nmea data
 
 GGA = {'String':'',
        'Sentence':'',
+       'Talker':'',
+       'Message':'',
+       'NMEA':'',
        'Fix':'',
        'Latitude':0.0,
        'North/South':'',

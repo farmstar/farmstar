@@ -26,6 +26,7 @@ class parse():
         self.STATUS = STATUS.STATUS
         self.GGA = GGA.GGA
         self.GSA = GSA.GSA
+        self.GSAALL = GSA.ALL
         self.line = line
     
         if self.line == None:
@@ -35,14 +36,18 @@ class parse():
             self.stripped = self.line.rstrip('\n\r')
             #Split into a list format
             self.sentence = self.stripped.split(",")
-            #Get the sentence type
-            self.NMEA = self.sentence[0][3:]
+            #Get the message type
+            self.message = self.sentence[0][3:]
+            #Get the talker type
+            self.talker = self.sentence[0][1:3]
+            #NMEA type
+            self.nmea = self.sentence[0][1:6]
 
             self.parseSTATUS()
             
-            if self.NMEA == 'GGA':
+            if self.message == 'GGA':
                 self.parseGGA()
-            elif self.NMEA == 'GSA':
+            elif self.message == 'GSA':
                 self.parseGSA()
             else:
                 pass
@@ -54,7 +59,10 @@ class parse():
         #Overall status
         self.STATUS['status'] = 'Doing Stuff'
         self.STATUS['string'] = self.stripped
-        self.STATUS['sentence'] = self.NMEA
+        self.STATUS['sentence'] = self.sentence
+        self.STATUS['talker'] = self.talker
+        self.STATUS['message'] = self.message
+        self.STATUS['nmea'] = self.nmea
         self.STATUS['check'] = self.CHECKSUM['status']
         self.STATUS['valid'] = self.CHECKSUM['valid']
         self.STATUS['checksum'] = self.CHECKSUM['checksum']
@@ -84,7 +92,10 @@ class parse():
         self.GGA['Local_time'] = self.SPACETIME['localtime']
         self.GGA['Age'] = self.SPACETIME['age']    
         self.GGA['String'] = self.stripped
-        self.GGA['Sentence'] = self.sentence[0][1:]
+        self.GGA['Sentence'] = self.sentence
+        self.GGA['Talker'] = self.sentence[0][3:]
+        self.GGA['Message'] = self.sentence[0][1:3]
+        self.GGA['NMEA'] = self.nmea
         self.GGA['Checksum'] = self.CHECKSUM['checksum']
         self.GGA['Calculated'] = self.CHECKSUM['calculated']
         self.GGA['Check'] = self.CHECKSUM['status']
@@ -132,24 +143,40 @@ class parse():
         self.GPS['CHECKSUM'] = self.CHECKSUM
         
 
-    def parseGSA(self):
+    def parseGSA(self):        
+
         self.GSA['Count_total'] += 1
         if self.CHECKSUM['valid'] == True:
             self.GSA['Count_good'] += 1
         else:
             self.GSA['Count_bad'] += 1
-
+        
+        
         self.GSA['string'] = self.stripped
-        self.GSA['sentence'] = self.sentence[0][1:]
+        self.GSA['sentence'] = self.sentence
+        self.GSA['talker'] = self.talker
+        self.GSA['message'] = self.message
+        self.GSA['nmea'] = self.nmea
         self.GSA['3d/2d'] = self.sentence[1]
-        self.GSA['type'] = self.sentence[2]
+        self.GSA['type'] = self.sentence[2]       
+        self.MOD = {'':'None',
+                    '1':'No Fix',
+                    '2':'2D Fix',
+                    '3':'3D Fix',
+                 }
+        self.GGA['mode'] = self.MOD[self.GSA['type']]    
         self.GSA['PRNs'] = self.sentence[3]
-        self.GSA['PDOP'] = self.sentence[-4]
-        self.GSA['HDOP'] = self.sentence[-3]
-        self.GSA['VDOP'] = self.sentence[-2]
+        self.GSA['PDOP'] = self.sentence[-3]
+        self.GSA['HDOP'] = self.sentence[-2]
+        self.GSA['VDOP'] = self.sentence[-1][-8:-3]
         self.GSA['checksum'] = self.CHECKSUM['checksum']
-
-        self.GPS['GSA'] = self.GSA
+        
+        self.GSAALL['list'].append(self.nmea)
+        self.GSAALL['list'] = list(set(self.GSAALL['list']))
+        self.GSAALL['GSA'] = self.GSA
+        self.GSAALL[self.nmea] = self.GSA
+        
+        self.GPS['GSA'] = self.GSAALL
 
 
 class main():
@@ -187,7 +214,19 @@ class main():
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
                 try:
                     #send line to parse
-                    parse(self.line)
+                    GPS = parse(self.line).GPS
+                    '''
+                    STATUS = GPS['STATUS']
+                    message = STATUS['message']
+                    talker = STATUS['talker']
+                    string = STATUS['string']
+                    nmea = STATUS['nmea']
+                    if message == 'GSA':
+                        print('Talker: {}'.format(talker))
+                        print('Message: {}'.format(message))
+                        print('NMEA: {}'.format(nmea))
+                    '''
+                    
                 except:
                     print("NMEA Parse Fail")
             except:

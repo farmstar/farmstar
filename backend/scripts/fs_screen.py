@@ -22,14 +22,10 @@ class display():
         self.STATUS = self.GPS['STATUS']
         self.SPACETIME = self.GPS['SPACETIME']
         self.GGA = self.GPS['GGA']
-        self.GSA = self.GPS['GSA']
+        self.GSA = self.GPS['GSA']['GSA']
         self.screen()
 
         '''
-        try:
-            stdscr = curses.initscr()
-        except:
-            raise Exception("Run from cmd or bash")
 
         try:
             subprocess.Popen([sys.executable, 'server.py'],
@@ -78,6 +74,18 @@ class display():
             box4.addstr(7,1,'Geo: {} {}'.format(self.GGA['GeoID_Height'],self.GGA['GeoID_Units']))
             box4.addstr(8,1,str(' '*20))
             box4.addstr(8,1,'Fix: {} UTC'.format(self.GGA['Fix']))
+
+            #Box 5
+            box5.addstr(1,1,str(' '*20))
+            box5.addstr(1,1,'2D/3D: {}'.format(self.GSA['3d/2d']))
+            box5.addstr(2,1,str(' '*20))
+            box5.addstr(2,1,'Type: {}'.format(self.GSA['type']))
+            box5.addstr(3,1,str(' '*20))
+            box5.addstr(3,1,'PDOP: {}'.format(self.GSA['PDOP']))
+            box5.addstr(4,1,str(' '*20))
+            box5.addstr(4,1,'HDOP: {}'.format(self.GSA['HDOP']))
+            box5.addstr(5,1,str(' '*20))
+            box5.addstr(5,1,'VDOP: {}'.format(self.GSA['VDOP']))
             
             
             
@@ -86,9 +94,10 @@ class display():
             box2.refresh()
             box3.refresh()
             box4.refresh()
+            box5.refresh()
         except:
             curses.endwin()
-            print("Screen Failed")
+            print("Give it a sec...")
 
         
 
@@ -124,6 +133,7 @@ class main():
         global box2
         global box3
         global box4
+        global box5
         
         print("Initiating screen...")
         stdscr = curses.initscr()
@@ -132,15 +142,18 @@ class main():
         box2 = curses.newwin(3, 18, 1, 81)
         box3 = curses.newwin(3, 20, 1, 99)
         box4 = curses.newwin(10, 22, 4, 1)
+        box5 = curses.newwin(10, 22, 14, 1)
         box1.box()
         box2.box()
         box3.box()
         box4.box()
+        box5.box()
         stdscr.addstr(0,50,"Farmstar Boiiii")
         box1.addstr(0,40,"Sentence")
         box2.addstr(0,5,"Checksum")
         box3.addstr(0,7,"Errors")
         box4.addstr(0,10,"GGA")
+        box5.addstr(0,10,"GSA")
         print("Stating GPS...")
 
     
