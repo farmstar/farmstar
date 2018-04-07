@@ -3,4 +3,7 @@ __all__ = ['GGA',
            'GPS',
            'SPACE',
            'STATUS',
-           'CHECK',]
+           'CHECK',
+           'MESSAGE',
+           'TALKER',
+           ]
