@@ -28,7 +28,6 @@ Help feed 10 billion people.
 #### Short Term
 - Plug and play displays
 - Simple clean interface
-- Free software on cheap hardware
 - On or offline mapping
 - Basic positioning
 - Heatmap of spray area
