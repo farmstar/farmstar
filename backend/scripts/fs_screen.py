@@ -15,6 +15,41 @@ needs to be initiated from a terminal not IDE
 '''
 
 
+class init():
+        
+    def __init__(self):
+        self.set()
+        
+    def set(self):
+        global stdscr
+        global box1
+        global box2
+        global box3
+        global box4
+        global box5
+        
+        print("Initiating screen...")
+        stdscr = curses.initscr()
+        stdscr.border(0)
+        box1 = curses.newwin(3, 80, 1, 1)
+        box2 = curses.newwin(3, 18, 1, 81)
+        box3 = curses.newwin(3, 20, 1, 99)
+        box4 = curses.newwin(10, 22, 4, 1)
+        box5 = curses.newwin(10, 30, 4, 23)
+        box1.box()
+        box2.box()
+        box3.box()
+        box4.box()
+        box5.box()
+        stdscr.addstr(0,50,"Farmstar Boiiii")
+        box1.addstr(0,40,"Sentence")
+        box2.addstr(0,5,"Checksum")
+        box3.addstr(0,7,"Errors")
+        box4.addstr(0,10,"GGA")
+        box5.addstr(0,13,"GSA")
+        print("Stating GPS...")
+
+
 class display():
 
     def __init__(self,GPS={}):
@@ -22,26 +57,18 @@ class display():
         self.STATUS = self.GPS['STATUS']
         self.SPACETIME = self.GPS['SPACETIME']
         self.GGA = self.GPS['GGA']
-        self.GSA = self.GPS['GSA']['GSA']
-        self.screen()
-
-        '''
-
         try:
-            subprocess.Popen([sys.executable, 'server.py'],
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
+            self.GSAALL = self.GPS['GSA']
+            self.GSA = self.GSAALL['GSA']
         except:
-            raise Exception("Failed to start server")    
-        '''
-
-
-
+            pass
+        self.screen()
 
 
     def screen(self):
 
         try:
+            
             #Box 1
             box1.addstr(1,1,' '*78)
             box1.addstr(1,1,self.STATUS['string'].center(78, ' '))
@@ -76,18 +103,33 @@ class display():
             box4.addstr(8,1,'Fix: {} UTC'.format(self.GGA['Fix']))
 
             #Box 5
+            '''
             box5.addstr(1,1,str(' '*20))
-            box5.addstr(1,1,'2D/3D: {}'.format(self.GSA['3d/2d']))
+            box5.addstr(1,1,'Talker: {}|{}|{}'.format(self.GSAALL[self.GSAALL['list'][0]]['nmea'],
+                                                      self.GSAALL[self.GSAALL['list'][1]]['nmea'],
+                                                      self.GSAALL[self.GSAALL['list'][2]]['nmea']))
+            
             box5.addstr(2,1,str(' '*20))
-            box5.addstr(2,1,'Type: {}'.format(self.GSA['type']))
+            box5.addstr(2,1,'  Mode: {} |{} |{}'.format(self.GSAALL[self.GSAALL['list'][0]]['selection'],
+                                                        self.GSAALL[self.GSAALL['list'][1]]['selection'],
+                                                        self.GSAALL[self.GSAALL['list'][2]]['selection']))
             box5.addstr(3,1,str(' '*20))
-            box5.addstr(3,1,'PDOP: {}'.format(self.GSA['PDOP']))
+            box5.addstr(3,1,'  Type:  {}  | {}  | {} '.format(self.GSAALL[self.GSAALL['list'][0]]['mode'],
+                                                                self.GSAALL[self.GSAALL['list'][1]]['mode'],
+                                                                self.GSAALL[self.GSAALL['list'][2]]['mode']))
             box5.addstr(4,1,str(' '*20))
-            box5.addstr(4,1,'HDOP: {}'.format(self.GSA['HDOP']))
+            box5.addstr(4,1,'  PDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['PDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][1]]['PDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][2]]['PDOP']))
             box5.addstr(5,1,str(' '*20))
-            box5.addstr(5,1,'VDOP: {}'.format(self.GSA['VDOP']))
-            
-            
+            box5.addstr(5,1,'  HDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['HDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][1]]['HDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][2]]['HDOP'],))
+            box5.addstr(6,1,str(' '*20))
+            box5.addstr(6,1,'  VDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['VDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][1]]['VDOP'],
+                                                           self.GSAALL[self.GSAALL['list'][2]]['VDOP'],))
+            '''
             
             stdscr.refresh()
             box1.refresh()
@@ -109,10 +151,13 @@ class main():
         self.line = ''
         self.ser = None
 
+
         if self.comports == '':
             print("No serial port specified")
             self.getPorts()
-        self.initScreen()
+        print('Initiating')
+        init()
+        print('Running..')
         self.run()
 
 
@@ -126,35 +171,6 @@ class main():
             self.comport = self.comports[0]
             self.run()
             
-
-    def initScreen(self):
-        global stdscr
-        global box1
-        global box2
-        global box3
-        global box4
-        global box5
-        
-        print("Initiating screen...")
-        stdscr = curses.initscr()
-        stdscr.border(0)
-        box1 = curses.newwin(3, 80, 1, 1)
-        box2 = curses.newwin(3, 18, 1, 81)
-        box3 = curses.newwin(3, 20, 1, 99)
-        box4 = curses.newwin(10, 22, 4, 1)
-        box5 = curses.newwin(10, 22, 14, 1)
-        box1.box()
-        box2.box()
-        box3.box()
-        box4.box()
-        box5.box()
-        stdscr.addstr(0,50,"Farmstar Boiiii")
-        box1.addstr(0,40,"Sentence")
-        box2.addstr(0,5,"Checksum")
-        box3.addstr(0,7,"Errors")
-        box4.addstr(0,10,"GGA")
-        box5.addstr(0,10,"GSA")
-        print("Stating GPS...")
 
     
     def run(self):

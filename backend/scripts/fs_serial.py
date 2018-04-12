@@ -1,28 +1,42 @@
 import serial
 import time
        
+'''
+Farmstar serial test module
+Will make this a callable  module one day
+
+'''
         
-def stream(port = None):
-    ser = None
-    if port == None:
-        print("No port specified")
-    while True: 
+
+class Stream():
+    def __init__(self, port):
+        self.port = port
+        self.ser = None
+        self.line = ''
+        self.status = "Initializing"
+
+    def Data(self):
+        self.status = "Starting"
         try:
-            if(ser == None or line == ''):
-                ser = serial.Serial(port,9600,timeout=1.5)
-                comstatus = "Reconnecting"
-            line = ser.readline().decode("utf-8").rstrip("\n\r") # Read the entire string
-            print(line)
+            if(self.ser == None or self.line == ''):
+                self.ser = serial.Serial(self.port,9600,timeout=1.5)
+                self.status = "Reconnecting"
+            self.line = self.ser.readline().decode("utf-8").rstrip("\n\r") # Read the entire string
+            self.status = "Running"
         except:
-            if(not(ser == None)):
-                ser.close()
-                ser = None
-                print("Disconnecting")
-            print("No Connection to {}".format(port))
+            if(not(self.ser == None)):
+                self.ser.close()
+                self.ser = None
+                self.status = "Disconnecting"
+            self.status = "No Connection to {}".format(self.port)
             time.sleep(2)
 
 
 
 
 if __name__ == '__main__':
-    stream("COM5")
+    stream = Stream('COM5')
+    while True:
+        stream.Data()
+        print(stream.status)
+        print(stream.line)

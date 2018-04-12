@@ -167,12 +167,12 @@ def scanSerial():
     comportlist = result
 
 def testSerial():
-    for port in comportlist
-    try:
-        ser = serial.Serial(comport,9600,timeout=1.5)
-        ser.readline().decode("utf-8")
-    except:
-        return(False)
+    for port in comportlist:
+        try:
+            ser = serial.Serial(comport,9600,timeout=1.5)
+            ser.readline().decode("utf-8")
+        except:
+            return(False)
     
 
 def saveSerial():

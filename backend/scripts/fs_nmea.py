@@ -141,7 +141,6 @@ class parse():
         self.GPS['SPACETIME'] = self.SPACETIME
         self.GPS['GGA'] = self.GGA
         self.GPS['CHECKSUM'] = self.CHECKSUM
-        
 
     def parseGSA(self):        
 
@@ -156,27 +155,56 @@ class parse():
         self.GSA['sentence'] = self.sentence
         self.GSA['talker'] = self.talker
         self.GSA['message'] = self.message
-        self.GSA['nmea'] = self.nmea
-        self.GSA['3d/2d'] = self.sentence[1]
-        self.GSA['type'] = self.sentence[2]       
-        self.MOD = {'':'None',
-                    '1':'No Fix',
-                    '2':'2D Fix',
-                    '3':'3D Fix',
+        self.GSA['nmea'] = self.sentence[0][1:6]
+        self.GSA['a/m'] = self.sentence[1]
+        self.SEL = {'':'None',
+                    'A':'Auto',
+                    'M':'Manu',
+                    }
+        self.GSA['selection'] = self.SEL[self.GSA['a/m']]
+        self.GSA['type'] = str(self.sentence[2])       
+        self.MOD = {'':'No',
+                    '1':'0D',
+                    '2':'2D',
+                    '3':'3D',
                  }
-        self.GGA['mode'] = self.MOD[self.GSA['type']]    
+        self.GSA['mode'] = self.MOD[self.GSA['type']]    
         self.GSA['PRNs'] = self.sentence[3]
         self.GSA['PDOP'] = self.sentence[-3]
         self.GSA['HDOP'] = self.sentence[-2]
         self.GSA['VDOP'] = self.sentence[-1][-8:-3]
         self.GSA['checksum'] = self.CHECKSUM['checksum']
         
-        self.GSAALL['list'].append(self.nmea)
-        self.GSAALL['list'] = list(set(self.GSAALL['list']))
-        self.GSAALL['GSA'] = self.GSA
-        self.GSAALL[self.nmea] = self.GSA
+        #Create a list of the different GSA talkers
+        nmealist = self.GSAALL['list']
+        #Append current GSA talker
+        nmealist.append(self.nmea)
+        #Unique items only
+        nmealist = list(set(nmealist))
+        #Sort alphabetically so it's always the same order
+        nmealist.sort()
+        #Write list back to dictionary
+        self.GSAALL['list'] = nmealist
         
+
+        #This doesn't work, they end up the same no matter what
+        #No shit I've tried for days on this one thing
+        self.GSAALL[self.GSA['nmea']] = self.GSA
+
+        #Write current GSA dictionary to the GSAALL dictionary
+        self.GSAALL['GSA'] = self.GSA
+        
+        #Write the GSAALL dictionary to the GPS dictionary
         self.GPS['GSA'] = self.GSAALL
+
+
+        '''
+        print('*'*100)
+        for k in self.GSAALL:
+            print('-'*100)
+            print(k, self.GSAALL[k])
+        '''
+
 
 
 class main():
