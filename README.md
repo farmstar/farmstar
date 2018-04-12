@@ -3,7 +3,7 @@ High precision farm management system.
 
 *NOTE: This is a side project, we have no idea what we are doing.*
 
-![Logo v1.0](/docs/media/logojoy-01.1.png?raw=true)
+![Logo v1.2](/docs/media/logojoy-01.2.png?raw=true)
 
 ## Vision
 Help feed 10 billion people.
