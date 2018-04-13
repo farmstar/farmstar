@@ -2,20 +2,21 @@ import serial
 import time
        
 '''
-Farmstar serial test module
-Will make this a callable  module one day
+Farmstar serial module
+Call stream once then call data in a loop
+(see main)
 
 '''
         
 
-class Stream():
+class stream():
     def __init__(self, port):
         self.port = port
         self.ser = None
         self.line = ''
         self.status = "Initializing"
 
-    def Data(self):
+    def data(self):
         self.status = "Starting"
         try:
             if(self.ser == None or self.line == ''):
@@ -35,8 +36,8 @@ class Stream():
 
 
 if __name__ == '__main__':
-    stream = Stream('COM5')
+    Stream = stream('COM5')
     while True:
-        stream.Data()
-        print(stream.status)
-        print(stream.line)
+        Stream.data()
+        print(Stream.status)
+        print(Stream.line)

@@ -1,15 +1,16 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import fs_nmea
 
-server = {'Status':'',
-          'Response':'',
-          'IP':'',
-          'Port':'',
-          }
+
+'''
+this won't work
+...looking into asyncio http server
+
+'''
 
 
 # HTTPRequestHandler class
 class RequestHandler(BaseHTTPRequestHandler):
+    
 
     def do_HEAD(self):
         self.send_response(200)
@@ -33,27 +34,34 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        lat = nmea.GGA['Latitude']
-        lon = nmea.GGA['Longitude']
-        content = '{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (lat,lon)
-        return bytes(content, 'UTF-8')
+        self.get_data()
+        return bytes(self.content, 'UTF-8')
 
-    
+    def get_data(self, geojson):
+        self.lat = -22.1831903
+        self.lon = 119.2604059
+        self.geojson = '{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (self.lat,self.lon)
+        self.content = self.geojson
 
     def respond(self, opts):
         response = self.handle_http(opts['status'], self.path)
         self.wfile.write(response)
+
+ 
+class run():
+
+    def __init__(self,):
+        self.server = {'Status':'',
+                       'Response':'',
+                       'IP':'',
+                       'Port':'',
+                       }
+        self.server['Status'] = "Starting"
+        server_address = ('127.0.0.1', 8081)
+        httpd = HTTPServer(server_address, RequestHandler)
+        self.server['Status'] = "Running"
+        httpd.serve_forever()
+ 
+if __name__ == '__main__':
     
- 
-def run():
-  server['Status'] = "Starting"
- 
-  # Server settings
-  # Choose port 8080, for port 80, which is normally used for a http server, you need root access
-  server_address = ('127.0.0.1', 8081)
-  httpd = HTTPServer(server_address, RequestHandler)
-  server['Status'] = "Running"
-  httpd.serve_forever()
- 
- 
-run()
+    run()
