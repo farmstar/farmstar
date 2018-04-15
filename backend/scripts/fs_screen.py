@@ -1,5 +1,6 @@
 import fs_nmea
 import fs_serial
+import fs_database
 import time
 import curses
 import subprocess
@@ -153,6 +154,7 @@ class main():
     def run(self):
         self.serial_stream_1 = fs_serial.stream(self.comport_1)
         self.Display = display()
+        self.db = fs_database.logging()
 
         while True:
             self.serial_stream_1.data()
@@ -160,8 +162,7 @@ class main():
             self.status_1 = self.serial_stream_1.status
             self.GPS_1 = fs_nmea.parse(self.line_1).GPS
             self.Display.screen(self.GPS_1)
-
-
+            self.db.data([33,22,11])
 
 if __name__ == '__main__':
     #Uses com module to scan for valid ports if a port isn't specified
