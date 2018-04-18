@@ -243,6 +243,13 @@ class main():
                 try:
                     #send line to parse
                     GPS = parse(self.line).GPS
+                    unix = GPS['SPACETIME']['unix']
+                    lat = GPS['GGA']['Latitude']
+                    lon = GPS['GGA']['Longitude']
+                    alt = GPS['GGA']['Altitude']
+                    data = [unix,lat,lon,alt]
+                    print(data)
+                    
                     '''
                     STATUS = GPS['STATUS']
                     message = STATUS['message']

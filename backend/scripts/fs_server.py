@@ -1,12 +1,13 @@
 from aiohttp import web
 import asyncio
 import json
+import fs_database
 
 
 '''
 Nope, just nope.
 '''
-
+cursor = fs_database.logging().c
 
 async def process(request):
     count = 0
@@ -19,8 +20,15 @@ async def process(request):
 
 
 async def handle(request):
+    cursor.execute("SELECT * FROM LOCATION ORDER BY UNIX DESC LIMIT 1")
+    result = cursor.fetchone()
+    lat = result[1]
+    lon = result[2]
+    print(result)
     asyncio.ensure_future(process(request))
-    body = json.dumps({'status': 'ok'}).encode('utf-8')
+
+    body = str('{"geometry": {"type": "Point", "coordinates": [%s, %s]}, "type": "Feature", "properties": {}}' % (lat,lon))
+    #body = json.dumps({'status': 'ok'}).encode('utf-8')
     return web.Response(body=body, content_type="application/json")
 
 def main():

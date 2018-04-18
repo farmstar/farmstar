@@ -17,6 +17,7 @@ class logging():
         self.project_root = os.path.abspath(os.path.join('..\..'))
         self.user_data = os.path.join(self.project_root, 'data')
         print(self.user_data)
+        self.count = 0
         try:
             if os.path.exists(os.path.join(self.project_root, 'data')):
                 print("Launched from backend")
@@ -67,18 +68,26 @@ class logging():
         print('Created columns OK!')
 
 
-    def data(self, location):
-        count = 0
-        self.lat = location[0]
-        self.lon = location[1]
-        self.alt = location[2]
-        count += 1
-        if count > 10:
+    def data(self, data):
+
+        self.c.execute('INSERT INTO LOCATION VALUES (?,?,?,?)' ,data)
+        self.c.execute("DELETE FROM LOCATION WHERE unix IS NULL OR trim(unix) = ''")
+        self.count += 1
+        if self.count > 10:
             self.conn.commit()
+            self.count = 0
         
 
 
 
 if __name__ == '__main__':
     db = logging()
-    db.data([33,22,11])
+    GPS = {'SPACETIME':{'unix':123},
+           'GGA':{'Latitude':456,
+                  'Longitude':789,
+                  'Altitude':101}
+           }
+
+                    
+    for x in range(11):
+        db.data(GPS)

@@ -58,7 +58,6 @@ class display():
             self.GSAALL = self.GPS['GSA']
             self.GSA = self.GSAALL['GSA']
         except:
-            print('GSA fail')
             pass
 
         try:
@@ -97,33 +96,35 @@ class display():
             self.box4.addstr(8,1,'Fix: {} UTC'.format(self.GGA['Fix']))
 
             #Box 5
-            '''
-            box5.addstr(1,1,str(' '*20))
-            box5.addstr(1,1,'Talker: {}|{}|{}'.format(self.GSAALL[self.GSAALL['list'][0]]['nmea'],
-                                                      self.GSAALL[self.GSAALL['list'][1]]['nmea'],
-                                                      self.GSAALL[self.GSAALL['list'][2]]['nmea']))
-            
-            box5.addstr(2,1,str(' '*20))
-            box5.addstr(2,1,'  Mode: {} |{} |{}'.format(self.GSAALL[self.GSAALL['list'][0]]['selection'],
-                                                        self.GSAALL[self.GSAALL['list'][1]]['selection'],
-                                                        self.GSAALL[self.GSAALL['list'][2]]['selection']))
-            box5.addstr(3,1,str(' '*20))
-            box5.addstr(3,1,'  Type:  {}  | {}  | {} '.format(self.GSAALL[self.GSAALL['list'][0]]['mode'],
-                                                                self.GSAALL[self.GSAALL['list'][1]]['mode'],
-                                                                self.GSAALL[self.GSAALL['list'][2]]['mode']))
-            box5.addstr(4,1,str(' '*20))
-            box5.addstr(4,1,'  PDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['PDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][1]]['PDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][2]]['PDOP']))
-            box5.addstr(5,1,str(' '*20))
-            box5.addstr(5,1,'  HDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['HDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][1]]['HDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][2]]['HDOP'],))
-            box5.addstr(6,1,str(' '*20))
-            box5.addstr(6,1,'  VDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['VDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][1]]['VDOP'],
-                                                           self.GSAALL[self.GSAALL['list'][2]]['VDOP'],))
-            '''
+            try:
+                self.box5.addstr(1,1,str(' '*20))
+                self.box5.addstr(1,1,'Talker: {}|{}|{}'.format(self.GSAALL[self.GSAALL['list'][0]]['nmea'],
+                                                          self.GSAALL[self.GSAALL['list'][1]]['nmea'],
+                                                          self.GSAALL[self.GSAALL['list'][2]]['nmea']))
+                
+                self.box5.addstr(2,1,str(' '*20))
+                self.box5.addstr(2,1,'  Mode: {} |{} |{}'.format(self.GSAALL[self.GSAALL['list'][0]]['selection'],
+                                                            self.GSAALL[self.GSAALL['list'][1]]['selection'],
+                                                            self.GSAALL[self.GSAALL['list'][2]]['selection']))
+                self.box5.addstr(3,1,str(' '*20))
+                self.box5.addstr(3,1,'  Type:  {}  | {}  | {} '.format(self.GSAALL[self.GSAALL['list'][0]]['mode'],
+                                                                    self.GSAALL[self.GSAALL['list'][1]]['mode'],
+                                                                    self.GSAALL[self.GSAALL['list'][2]]['mode']))
+                self.box5.addstr(4,1,str(' '*20))
+                self.box5.addstr(4,1,'  PDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['PDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][1]]['PDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][2]]['PDOP']))
+                self.box5.addstr(5,1,str(' '*20))
+                self.box5.addstr(5,1,'  HDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['HDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][1]]['HDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][2]]['HDOP'],))
+                self.box5.addstr(6,1,str(' '*20))
+                self.box5.addstr(6,1,'  VDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['VDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][1]]['VDOP'],
+                                                               self.GSAALL[self.GSAALL['list'][2]]['VDOP'],))
+            except:
+                self.box5.addstr(1,3,'Failed to get GSA data.')
+
             
             self.stdscr.refresh()
             self.box1.refresh()
@@ -155,6 +156,7 @@ class main():
         self.serial_stream_1 = fs_serial.stream(self.comport_1)
         self.Display = display()
         self.db = fs_database.logging()
+        self.data = ['','','','']
 
         while True:
             self.serial_stream_1.data()
@@ -162,7 +164,25 @@ class main():
             self.status_1 = self.serial_stream_1.status
             self.GPS_1 = fs_nmea.parse(self.line_1).GPS
             self.Display.screen(self.GPS_1)
-            self.db.data([33,22,11])
+        
+            self.SPACETIME = self.GPS_1['SPACETIME']
+            self.GGA = self.GPS_1['GGA']
+
+            #This is a stupid way of doing this, the normal way isn't working.
+            for key in self.SPACETIME:
+                if key == 'unix':
+                    self.data[0] = self.SPACETIME[key]
+            for key in self.GGA:
+                if key == 'Latitude':
+                    self.data[1] = self.GGA[key]
+                elif key == 'Longitude':
+                    self.data[2] = self.GGA[key]
+                elif key == 'Altitude':
+                    self.data[3] = self.GGA[key]
+
+            self.db.data(self.data)
+                    
+
 
 if __name__ == '__main__':
     #Uses com module to scan for valid ports if a port isn't specified
@@ -171,3 +191,4 @@ if __name__ == '__main__':
     Main.run()
     
 
+ 
