@@ -1,0 +1,40 @@
+{% load leaflet_tags %}
+{% load static %}
+  <head>
+    {% leaflet_css %}
+	<style>
+		.leaflet-container{
+			/* all maps */
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+	<script type="text/javascript">
+	function map_init_basic (map) {
+		var realtime = L.realtime({
+			url: 'http://localhost:8000/',
+			crossOrigin: true,
+			type: 'json'
+		}, {
+			interval: 3 * 1000,
+			pointToLayer: function (feature, latlng) {
+				return L.marker(latlng, {
+					'icon': L.icon({
+						iconUrl: '{% static "farmstar_map/Tractor-Blue_rot.png" %}',
+						iconSize:     [38, 95], // size of the icon
+						iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+						popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+					})
+				});
+			}
+		}).addTo(map);
+		zoom = getZoom(map)
+	}
+	</script>
+  </head>
+  <body>
+  	{% leaflet_js %}
+    {% leaflet_map "map" callback="window.map_init_basic"%}
+	{% leaflet_js plugins="realtime" %}
+  </body>
+
