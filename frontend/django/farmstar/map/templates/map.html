@@ -12,7 +12,7 @@
 	<script type="text/javascript">
 	function map_init_basic (map) {
 		var realtime = L.realtime({
-			url: 'http://localhost:8000/',
+			url: 'http://localhost:8001/',
 			crossOrigin: true,
 			type: 'json'
 		}, {
@@ -20,7 +20,7 @@
 			pointToLayer: function (feature, latlng) {
 				return L.marker(latlng, {
 					'icon': L.icon({
-						iconUrl: '{% static "farmstar_map/Tractor-Blue_rot.png" %}',
+						iconUrl: '{% static "Tractor-Blue.png" %}',
 						iconSize:     [38, 95], // size of the icon
 						iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
 						popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
@@ -28,7 +28,6 @@
 				});
 			}
 		}).addTo(map);
-		zoom = getZoom(map)
 	}
 	</script>
   </head>
