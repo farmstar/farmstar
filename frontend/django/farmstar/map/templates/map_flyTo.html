@@ -20,35 +20,28 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYmVuMCIsImEiOiJjajh1ZDMzNzkweXU5MnJvNmNjOGE1c
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/satellite-v9',
-    zoom: 0
 });
 
 var url = 'http://127.0.0.1:8001';
 map.on('load', function () {
     window.setInterval(function() {
         map.getSource('drone').setData(url);
-		var features = map.queryRenderedFeatures({ layers: ['drone'] });
-		var droneLngLat = features[0].geometry.coordinates
-		map.flyTo({center: droneLngLat, 
-				'zoom': 20, 
-				'bearing':0, 
-				'pitch':60,
-				'speed':0.1
-		});
     }, 2000);
 
     map.addSource('drone', { type: 'geojson', data: url });
-	map.addControl(new mapboxgl.NavigationControl());
-
     map.addLayer({
         "id": "drone",
         "type": "symbol",
         "source": "drone",
         "layout": {
             "icon-image": "rocket-15"
-        },
-		"includeGeometry": "true"
+        }
     });
+	map.flyTo({ 'center': [115.6265645, -33.3655666], 
+				'zoom': 20, 
+				'bearing':45, 
+				'pitch':60
+	});
 });
 </script>
 
