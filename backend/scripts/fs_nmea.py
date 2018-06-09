@@ -13,22 +13,24 @@ Converts GPS data into a bunch of dictionaries
 Creates a dictionary of all dictionaries
 REMEMBER TO PUT NEW DICTIONARIES IN THE __init__.py
 Amount of time wasted forgetting that... about 3
-'''
 
+A serious problem where it iterates the entire thing every line
+'''
 
 class parse():
 
     #parse raw nmea data (one line at a time)
     #Currently only GGA
     
-    def __init__(self, line=None):
+    def __init__(self):
         self.GPS = GPS.GPS
         self.STATUS = STATUS.STATUS
         self.GGA = GGA.GGA
         self.GSA = GSA.GSA
         self.GSAALL = GSA.ALL
+
+    def parseLine(self,line=None):
         self.line = line
-    
         if self.line == None:
             print("No data recieved")
         else:
@@ -51,6 +53,8 @@ class parse():
                 self.parseGSA()
             else:
                 pass
+            return(self.GPS)
+
         
     def parseSTATUS(self):
         #Send to checksum parser
@@ -132,7 +136,7 @@ class parse():
         #GGA Other
         self.GGA['Satellites'] = self.sentence[7]
         self.GGA['Accuracy'] = self.sentence[8]
-        self.GGA['Altitude'] =  self.sentence[9]
+        self.GGA['Altitude'] =  float(self.sentence[9])
         self.GGA['Altitude_Units'] = self.sentence[10]
         self.GGA['GeoID_Height'] = self.sentence[11]
         self.GGA['GeoID_Units'] = self.sentence[12]
@@ -143,7 +147,6 @@ class parse():
         self.GPS['CHECKSUM'] = self.CHECKSUM
 
     def parseGSA(self):        
-
         self.GSA['Count_total'] += 1
         if self.CHECKSUM['valid'] == True:
             self.GSA['Count_good'] += 1
@@ -176,20 +179,20 @@ class parse():
         self.GSA['checksum'] = self.CHECKSUM['checksum']
         
         #Create a list of the different GSA talkers
-        nmealist = self.GSAALL['list']
+        gsalist = self.GSAALL['list']
         #Append current GSA talker
-        nmealist.append(self.nmea)
+        gsalist.append(self.nmea)
         #Unique items only
-        nmealist = list(set(nmealist))
+        gsalist = list(set(gsalist))
         #Sort alphabetically so it's always the same order
-        nmealist.sort()
+        gsalist.sort()
         #Write list back to dictionary
-        self.GSAALL['list'] = nmealist
+        self.GSAALL['list'] = gsalist
         
-
+        
         #This doesn't work, they end up the same no matter what
         #No shit I've tried for days on this one thing
-        self.GSAALL[self.GSA['nmea']] = self.GSA
+        self.GSAALL[self.nmea] = self.GSA
 
         #Write current GSA dictionary to the GSAALL dictionary
         self.GSAALL['GSA'] = self.GSA
@@ -235,20 +238,40 @@ class main():
 
     def run(self):
         self.comport = self.comports[0]
+        self.parse = parse()
         while True:
             try:
                 if(self.ser == None or self.line == ''):
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
+                
                 try:
                     #send line to parse
-                    GPS = parse(self.line).GPS
-                    unix = GPS['SPACETIME']['unix']
-                    lat = GPS['GGA']['Latitude']
-                    lon = GPS['GGA']['Longitude']
-                    alt = GPS['GGA']['Altitude']
-                    data = [unix,lat,lon,alt]
-                    print(data)
+                    self.GPS = self.parse.parseLine(self.line)
+                    self.GGA = self.GPS['GGA']
+                    self.GSA = self.GPS['GSA']
+                    self.ST = self.GPS['SPACETIME']
+                    self.STAT = self.GPS['STATUS']
+                    self.message = self.STAT['message']
+
+                    if self.message == 'GGA':
+                        unix = self.ST['unix']
+                        lat = self.GGA['Latitude']
+                        lon = self.GGA['Longitude']
+                        alt = self.GGA['Altitude']
+                        data = [unix,lat,lon,alt]
+                        print(data)
+                    elif self.message == 'GSA':
+                        GSA0 = self.GSA['list'][0]
+                        GSA1 = self.GSA['list'][1]
+                        GSA2 = self.GSA['list'][2]
+                        if self.GSA['GSA']['nmea'] == GSA0:
+                            print(self.GSA[GSA0]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA1:
+                            print(self.GSA[GSA1]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA2:
+                            print(self.GSA[GSA2]['string'])
+
                     
                     '''
                     STATUS = GPS['STATUS']
@@ -271,8 +294,6 @@ class main():
                     print("Disconnecting")
                 print("No Connection to {}".format(self.comport))
                 time.sleep(2)
-
-
 
 
 

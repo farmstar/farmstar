@@ -6,6 +6,7 @@ import curses
 import subprocess
 import sys
 import com
+from dicts import *
 
 '''
 Farmstar screen module
@@ -39,26 +40,18 @@ class display():
         self.box5.addstr(0,13,"GSA")
 
 
-    def screen(self,GPS={}):
-        
-        self.GPS = GPS
-        try:
-            self.STATUS = self.GPS['STATUS']
-        except:
-            print('Status fail')
-        try:
-            self.SPACETIME = self.GPS['SPACETIME']
-        except:
-            pass
-        try:
-            self.GGA = self.GPS['GGA']
-        except:
-            pass
-        try:
-            self.GSAALL = self.GPS['GSA']
-            self.GSA = self.GSAALL['GSA']
-        except:
-            pass
+    def screen(self,GPS=None):
+        if GPS == None:
+            self.GPS = GPS.GPS
+        else:
+            self.GPS = GPS
+            
+        self.STATUS = self.GPS['STATUS']
+        self.SPACETIME = self.GPS['SPACETIME']
+        self.GGA = self.GPS['GGA']
+        self.GSAALL = self.GPS['GSA']
+
+
 
         try:
             
@@ -97,23 +90,27 @@ class display():
 
             #Box 5
             try:
+                GSA0 = self.GSAALL['list'][0]
+                GSA1 = self.GSAALL['list'][1]
+                GSA2 = self.GSAALL['list'][2]
+                
                 self.box5.addstr(1,1,str(' '*20))
-                self.box5.addstr(1,1,'Talker: {}|{}|{}'.format(self.GSAALL[self.GSAALL['list'][0]]['nmea'],
-                                                          self.GSAALL[self.GSAALL['list'][1]]['nmea'],
-                                                          self.GSAALL[self.GSAALL['list'][2]]['nmea']))
+                self.box5.addstr(1,1,'Talker: {}|{}|{}'.format(GSA0,
+                                                               GSA1,
+                                                               GSA2))
                 
                 self.box5.addstr(2,1,str(' '*20))
-                self.box5.addstr(2,1,'  Mode: {} |{} |{}'.format(self.GSAALL[self.GSAALL['list'][0]]['selection'],
-                                                            self.GSAALL[self.GSAALL['list'][1]]['selection'],
-                                                            self.GSAALL[self.GSAALL['list'][2]]['selection']))
+                self.box5.addstr(2,1,'  Mode: {} |{} |{}'.format(self.GSAALL[GSA0]['selection'],
+                                                                 self.GSAALL[GSA1]['selection'],
+                                                                 self.GSAALL[GSA2]['selection']))
                 self.box5.addstr(3,1,str(' '*20))
-                self.box5.addstr(3,1,'  Type:  {}  | {}  | {} '.format(self.GSAALL[self.GSAALL['list'][0]]['mode'],
-                                                                    self.GSAALL[self.GSAALL['list'][1]]['mode'],
-                                                                    self.GSAALL[self.GSAALL['list'][2]]['mode']))
+                self.box5.addstr(3,1,'  Type:  {}  | {}  | {} '.format(self.GSAALL[GSA0]['mode'],
+                                                                       self.GSAALL[GSA1]['mode'],
+                                                                       self.GSAALL[GSA2]['mode']))
                 self.box5.addstr(4,1,str(' '*20))
-                self.box5.addstr(4,1,'  PDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['PDOP'],
-                                                               self.GSAALL[self.GSAALL['list'][1]]['PDOP'],
-                                                               self.GSAALL[self.GSAALL['list'][2]]['PDOP']))
+                self.box5.addstr(4,1,'  PDOP:  {} | {} | {}'.format(self.GSAALL[GSA0]['PDOP'],
+                                                                    self.GSAALL[GSA1]['PDOP'],
+                                                                    self.GSAALL[GSA2]['PDOP']))
                 self.box5.addstr(5,1,str(' '*20))
                 self.box5.addstr(5,1,'  HDOP:  {} | {} | {}'.format(self.GSAALL[self.GSAALL['list'][0]]['HDOP'],
                                                                self.GSAALL[self.GSAALL['list'][1]]['HDOP'],

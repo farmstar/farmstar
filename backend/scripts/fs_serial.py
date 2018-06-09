@@ -1,5 +1,6 @@
 import serial
 import time
+from dicts import *
        
 '''
 Farmstar serial module
@@ -11,10 +12,12 @@ Call stream once then call data in a loop
 
 class stream():
     def __init__(self, port):
+        self.serial = SERIAL.SERIAL
         self.port = port
         self.ser = None
         self.line = ''
         self.status = "Initializing"
+        self.serial['status'] = self.status
 
     def data(self):
         self.status = "Starting"
@@ -31,6 +34,10 @@ class stream():
                 self.status = "Disconnecting"
             self.status = "No Connection to {}".format(self.port)
             time.sleep(2)
+        self.serial['status'] = self.status
+        self.serial['port'] = self.port
+        self.serial['line'] = self.line
+        return(self.serial)
 
 
 
@@ -38,6 +45,5 @@ class stream():
 if __name__ == '__main__':
     Stream = stream('COM5')
     while True:
-        Stream.data()
-        print(Stream.status)
-        print(Stream.line)
+        print(Stream.data())
+        

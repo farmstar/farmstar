@@ -24,20 +24,23 @@ var map = new mapboxgl.Map({
 });
 
 var url = 'http://127.0.0.1:8001';
+var url2 = 'http://127.0.0.1:8001/geoline';
 map.on('load', function () {
     window.setInterval(function() {
         map.getSource('drone').setData(url);
+		map.getSource('drone_path').setData(url2);
 		var features = map.queryRenderedFeatures({ layers: ['drone'] });
 		var droneLngLat = features[0].geometry.coordinates
 		map.flyTo({center: droneLngLat, 
 				'zoom': 20, 
 				'bearing':0, 
 				'pitch':60,
-				'speed':0.1
+				'speed':1
 		});
-    }, 2000);
+    }, 1000);
 
     map.addSource('drone', { type: 'geojson', data: url });
+	map.addSource('drone_path', { type: 'geojson', data: url2 });
 	map.addControl(new mapboxgl.NavigationControl());
 
     map.addLayer({
@@ -48,6 +51,19 @@ map.on('load', function () {
             "icon-image": "rocket-15"
         },
 		"includeGeometry": "true"
+    });
+    map.addLayer({
+        "id": "route",
+        "type": "line",
+        "source": "drone_path",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "paint": {
+            "line-color": "#888",
+            "line-width": 8
+        }
     });
 });
 </script>

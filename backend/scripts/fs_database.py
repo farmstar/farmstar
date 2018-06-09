@@ -69,11 +69,13 @@ class logging():
 
 
     def data(self, data):
-
-        self.c.execute('INSERT INTO LOCATION VALUES (?,?,?,?)' ,data)
-        self.c.execute("DELETE FROM LOCATION WHERE unix IS NULL OR trim(unix) = ''")
-        self.count += 1
+        if data == ['','','','']:
+            pass
+        else:
+            self.c.execute('INSERT INTO LOCATION VALUES (?,?,?,?)' ,data)
+            self.count += 1
         if self.count > 10:
+            self.c.execute("DELETE FROM LOCATION WHERE unix IS NULL OR trim(unix) = ''")
             self.conn.commit()
             self.count = 0
         
