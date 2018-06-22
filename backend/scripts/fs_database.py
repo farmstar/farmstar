@@ -27,10 +27,9 @@ class logging():
                 print("Launched from project root")
                 sys.path.append(os.path.dirname(os.path.join('..')))
                 import data.config
-            self.test()
         except:
             print('Failed')
-        
+        self.test()        
 
     def test(self):
         db_exists = 0
@@ -44,8 +43,16 @@ class logging():
             self.connect()
             print(self.db)
         else:
-            print('no database exists')
-            self.db = 'fsdb.db'
+            print('No database exists.')
+            self.createDB()
+
+    def createDB(self):
+        print("Creating database...")
+        self.db = os.path.join(self.user_data, 'fsdb.db')
+        conn = sqlite3.connect(self.db)
+        conn.cursor()
+        conn.close()
+        self.connect()
 
     def connect(self):
         self.conn = sqlite3.connect(self.db)
@@ -89,7 +96,8 @@ if __name__ == '__main__':
                   'Longitude':789,
                   'Altitude':101}
            }
+    data = [GPS['SPACETIME']['unix'],GPS['GGA']['Latitude'],GPS['GGA']['Longitude'],GPS['GGA']['Altitude']]
 
                     
     for x in range(11):
-        db.data(GPS)
+        db.data(data)
