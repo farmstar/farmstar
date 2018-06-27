@@ -1,83 +1,76 @@
-from dicts import *
-import fs_nmea
-import fs_screen
-import fs_checksum
-import fs_com
-import fs_serial
-import fs_database
-import fs_server
-import os
-import json
+import bs4 as bs
+import requests
+from multiprocessing import Pool
+import utm
+import sqlite3
+import time
+from dicts import IPLIST, XIM
 
 
-'''
-Farmstar backend run script
-The 'main' running script
-Needs to be initiated from shell for screen to work
-'''
 
 
-class backend():
+utmnum = 50
+utmlet = 'K'
+iplist = IPLIST.XIM
+ximinfo = XIM.INFO
+ximlist = {}
 
-    def __init__(self,comports=''):
-        self.comports = comports
-        self.comport()
-        self.run()
+
+def scrape(ip):
+    url = ''.join(['http://', ip, ':3785/getinfocore'])
+
+    try:
+        resp = requests.get(url, timeout=1)
+        soup = bs.BeautifulSoup(resp.text, 'lxml')
+        device = soup.find("td", text='Device ID:').find_next_sibling('td').text
+        easting = soup.find("td", text='Easting (m):').find_next_sibling('td').text
+        northing = soup.find("td", text='Northing (m):').find_next_sibling('td').text
+        elevation = soup.find("td", text='Elevation (m):').find_next_sibling('td').text
+        latlon = utm.to_latlon(float(easting),float(northing),utmnum,utmlet)
+
+        ximinfo['device'] = device
+        ximinfo['ip'] = ip
+        ximinfo['easting'] = easting
+        ximinfo['northing'] = northing
+        ximinfo['elevation'] = elevation
+        ximinfo['latitude'] = latlon[0]
+        ximinfo['longitude'] = latlon[1]
+
+        return(ximinfo)
         
-    def comport(self):
-        if self.comports == '':
-            print("No serial port specified")
-            self.comports = com.Ports().valid
-            if self.comports == []:
-                print("Unable to find valid gps port")
-            else:
-                self.comport_1 = self.comports[0]
-        else:
-            self.comport_1 = self.comports[0]
+    except:
+        pass
 
-    def run(self):
-        self.serial_stream_1 = fs_serial.stream(self.comport_1)
-        self.display = fs_screen.display()
-        self.db = fs_database.logging()
-        self.parseLine = fs_nmea.parse()
-        self.data = ['','','','']
-        self.timer = 0
-        if os.name == 'nt':
-           os.system('start cmd /K python fs_server.py')
 
-        while True:
-            self.serial_data = self.serial_stream_1.data()
-            self.line_1 = self.serial_data['line']
-            self.status_1 = self.serial_data['status']
-            self.GPS_1 = self.parseLine.parseLine(self.line_1)
-            self.display.screen(self.GPS_1)
-            self.SPACETIME = self.GPS_1['SPACETIME']
-            self.STATUS = self.GPS_1['STATUS']
-            self.message = self.STATUS['message']
 
-            
-            #Have to do 'if dict', won't work otherwise
-            if type(self.SPACETIME) is dict:
-                self.data[0] = self.SPACETIME['unix']
-            else:
-                pass
-            if self.message == 'GGA':
-                self.GGA = self.GPS_1['GGA']
-                if type(self.GGA) is dict:
-                    self.data[1] = self.GGA['Latitude']
-                    self.data[2] = self.GGA['Longitude']
-                    self.data[3] = self.GGA['Altitude']
-                else:
-                    pass
-            
-            try:
-                if self.data[0] > self.timer:
-                    self.timer = self.data[0]
-                    self.db.data(self.data)
-            except:
-                pass
 
 
 
 if __name__ == '__main__':
-    backend(['COM5'])
+    iplist = IPLIST.XIM
+    how_many = len(iplist)
+    p = Pool(processes=how_many)
+    conn = sqlite3.connect('xim.db')
+    c = conn.cursor()
+    while True:
+        results = [p.apply_async(scrape, args=(ip,)) for ip in iplist]
+        output = [p.get() for p in results]
+        for i in output:
+            data = []
+            if i != None:
+                dev = i['device']
+                ximlist[dev] = i
+                c.execute(("CREATE TABLE IF NOT EXISTS {} (unix INT)").format(dev))
+                for key in i:
+                    try:
+                        c.execute(("ALTER TABLE {} ADD COLUMN {}").format(dev,key))
+                    except:
+                        data.append(i[key])
+                unix = [time.time()]
+                final_data = unix+data
+                print(final_data)
+                if len(final_data) == 8:
+                    c.execute(('INSERT INTO {} VALUES (?,?,?,?,?,?,?,?)').format(dev) ,final_data)
+                conn.commit()
+    
+    

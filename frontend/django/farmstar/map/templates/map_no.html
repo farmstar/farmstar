@@ -19,36 +19,26 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmVuMCIsImEiOiJjajh1ZDMzNzkweXU5MnJvNmNjOGE1c3UzIn0.lj3vfW_n49fbhc1V46qfUA';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/ben0/cj8ud4j8we8ip2ts1pi5phr3a',
+    style: 'mapbox://styles/mapbox/satellite-v9',
     zoom: 0
 });
 
 var url = 'http://127.0.0.1:8001';
 var url2 = 'http://127.0.0.1:8001/geoline';
 var url3 = 'http://127.0.0.1:8001/xIMs';
-
 map.on('load', function () {
+    window.setInterval(function() {
+        map.getSource('drone').setData(url);
+		map.getSource('drone_path').setData(url2);
+		map.getSource('xIMs').setData(url3);
+		var features = map.queryRenderedFeatures({ layers: ['drone'] });
+		var droneLngLat = features[0].geometry.coordinates
+    }, 1000);
 
     map.addSource('drone', { type: 'geojson', data: url });
 	map.addSource('drone_path', { type: 'geojson', data: url2 });
 	map.addSource('xIMs', { type: 'geojson', data: url3 });
 	map.addControl(new mapboxgl.NavigationControl());
-
-    window.setInterval(function() {
-        map.getSource('drone').setData(url);
-		map.getSource('drone_path').setData(url2);
-		map.getSource('xIMs').setData(url3);
-		var features = map.queryRenderedFeatures({ layers: ['Trucks'] });
-		var droneLngLat = features[0].geometry.coordinates
-		map.flyTo({center: droneLngLat, 
-				'zoom': 12, 
-				'bearing':0, 
-				'pitch':60,
-				'speed':1
-		});
-    }, 1000);
-
-
 
     map.addLayer({
         "id": "drone",
@@ -73,19 +63,16 @@ map.on('load', function () {
         }
     });
     map.addLayer({
-        "id": "Trucks",
-        "type": "symbol",
+        "id": "xIMs",
+        "type": "feature",
         "source": "xIMs",
         "layout": {
             "icon-image": "rocket-15"
         },
-		"includeGeometry": "true"
+        "includeGeometry": "true"
+        }
     });
-	
-
-	
 });
-
 </script>
 
 </body>

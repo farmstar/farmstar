@@ -44,6 +44,7 @@ class backend():
         self.timer = 0
         if os.name == 'nt':
            os.system('start cmd /K python fs_server.py')
+           os.system('start cmd /K python fs_xIM.py')
 
         while True:
             self.serial_data = self.serial_stream_1.data()
