@@ -47,7 +47,7 @@ def launch(args):
 
 def frontend(binding):
     #Front end webui os command arguments
-    frontend_dir = os.path.join(cwd, 'frontend', 'django', 'manage.py')
+    frontend_dir = os.path.join(cwd, 'frontend', 'django', 'farmstar', 'manage.py')
     frontend_args = ' runserver '+binding
     frontend_run = python+' '+'"'+frontend_dir+'"'+' '+frontend_args
 
@@ -73,7 +73,7 @@ def chrome(binding):
 
 def backend():
     backend_dir = os.path.join(cwd, 'backend','scripts')
-    backend_run = python+' '+'"'+backend_dir+'"'+'/run.py'
+    backend_run = python+' '+'"'+backend_dir+'"'+'/fs_run.py'
     backend_cmd = 'start cmd /K '+backend_run
     os.system(backend_cmd)
     

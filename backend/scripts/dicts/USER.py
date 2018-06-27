@@ -1,0 +1,4 @@
+USER = {'firstname':'',
+        'lastname':'',
+        'dob':'',
+        }

@@ -13,22 +13,24 @@ Converts GPS data into a bunch of dictionaries
 Creates a dictionary of all dictionaries
 REMEMBER TO PUT NEW DICTIONARIES IN THE __init__.py
 Amount of time wasted forgetting that... about 3
-'''
 
+A serious problem where it iterates the entire thing every line
+'''
 
 class parse():
 
     #parse raw nmea data (one line at a time)
     #Currently only GGA
     
-    def __init__(self, line=None):
+    def __init__(self):
         self.GPS = GPS.GPS
         self.STATUS = STATUS.STATUS
         self.GGA = GGA.GGA
         self.GSA = GSA.GSA
         self.GSAALL = GSA.ALL
+
+    def parseLine(self,line=None):
         self.line = line
-    
         if self.line == None:
             print("No data recieved")
         else:
@@ -51,6 +53,8 @@ class parse():
                 self.parseGSA()
             else:
                 pass
+            return(self.GPS)
+
         
     def parseSTATUS(self):
         #Send to checksum parser
@@ -132,7 +136,7 @@ class parse():
         #GGA Other
         self.GGA['Satellites'] = self.sentence[7]
         self.GGA['Accuracy'] = self.sentence[8]
-        self.GGA['Altitude'] =  self.sentence[9]
+        self.GGA['Altitude'] =  float(self.sentence[9])
         self.GGA['Altitude_Units'] = self.sentence[10]
         self.GGA['GeoID_Height'] = self.sentence[11]
         self.GGA['GeoID_Units'] = self.sentence[12]
@@ -141,10 +145,8 @@ class parse():
         self.GPS['SPACETIME'] = self.SPACETIME
         self.GPS['GGA'] = self.GGA
         self.GPS['CHECKSUM'] = self.CHECKSUM
-        
 
     def parseGSA(self):        
-
         self.GSA['Count_total'] += 1
         if self.CHECKSUM['valid'] == True:
             self.GSA['Count_good'] += 1
@@ -156,27 +158,56 @@ class parse():
         self.GSA['sentence'] = self.sentence
         self.GSA['talker'] = self.talker
         self.GSA['message'] = self.message
-        self.GSA['nmea'] = self.nmea
-        self.GSA['3d/2d'] = self.sentence[1]
-        self.GSA['type'] = self.sentence[2]       
-        self.MOD = {'':'None',
-                    '1':'No Fix',
-                    '2':'2D Fix',
-                    '3':'3D Fix',
+        self.GSA['nmea'] = self.sentence[0][1:6]
+        self.GSA['a/m'] = self.sentence[1]
+        self.SEL = {'':'None',
+                    'A':'Auto',
+                    'M':'Manu',
+                    }
+        self.GSA['selection'] = self.SEL[self.GSA['a/m']]
+        self.GSA['type'] = str(self.sentence[2])       
+        self.MOD = {'':'No',
+                    '1':'0D',
+                    '2':'2D',
+                    '3':'3D',
                  }
-        self.GGA['mode'] = self.MOD[self.GSA['type']]    
+        self.GSA['mode'] = self.MOD[self.GSA['type']]    
         self.GSA['PRNs'] = self.sentence[3]
         self.GSA['PDOP'] = self.sentence[-3]
         self.GSA['HDOP'] = self.sentence[-2]
         self.GSA['VDOP'] = self.sentence[-1][-8:-3]
         self.GSA['checksum'] = self.CHECKSUM['checksum']
         
-        self.GSAALL['list'].append(self.nmea)
-        self.GSAALL['list'] = list(set(self.GSAALL['list']))
-        self.GSAALL['GSA'] = self.GSA
-        self.GSAALL[self.nmea] = self.GSA
+        #Create a list of the different GSA talkers
+        gsalist = self.GSAALL['list']
+        #Append current GSA talker
+        gsalist.append(self.nmea)
+        #Unique items only
+        gsalist = list(set(gsalist))
+        #Sort alphabetically so it's always the same order
+        gsalist.sort()
+        #Write list back to dictionary
+        self.GSAALL['list'] = gsalist
         
+        
+        #This doesn't work, they end up the same no matter what
+        #No shit I've tried for days on this one thing
+        self.GSAALL[self.nmea] = self.GSA
+
+        #Write current GSA dictionary to the GSAALL dictionary
+        self.GSAALL['GSA'] = self.GSA
+        
+        #Write the GSAALL dictionary to the GPS dictionary
         self.GPS['GSA'] = self.GSAALL
+
+
+        '''
+        print('*'*100)
+        for k in self.GSAALL:
+            print('-'*100)
+            print(k, self.GSAALL[k])
+        '''
+
 
 
 class main():
@@ -207,14 +238,41 @@ class main():
 
     def run(self):
         self.comport = self.comports[0]
+        self.parse = parse()
         while True:
             try:
                 if(self.ser == None or self.line == ''):
                     self.ser = serial.Serial(self.comport,9600,timeout=1.5)
                 self.line = self.ser.readline().decode("utf-8") # Read the entire string
+                
                 try:
                     #send line to parse
-                    GPS = parse(self.line).GPS
+                    self.GPS = self.parse.parseLine(self.line)
+                    self.GGA = self.GPS['GGA']
+                    self.GSA = self.GPS['GSA']
+                    self.ST = self.GPS['SPACETIME']
+                    self.STAT = self.GPS['STATUS']
+                    self.message = self.STAT['message']
+
+                    if self.message == 'GGA':
+                        unix = self.ST['unix']
+                        lat = self.GGA['Latitude']
+                        lon = self.GGA['Longitude']
+                        alt = self.GGA['Altitude']
+                        data = [unix,lat,lon,alt]
+                        print(data)
+                    elif self.message == 'GSA':
+                        GSA0 = self.GSA['list'][0]
+                        GSA1 = self.GSA['list'][1]
+                        GSA2 = self.GSA['list'][2]
+                        if self.GSA['GSA']['nmea'] == GSA0:
+                            print(self.GSA[GSA0]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA1:
+                            print(self.GSA[GSA1]['string'])
+                        elif self.GSA['GSA']['nmea'] == GSA2:
+                            print(self.GSA[GSA2]['string'])
+
+                    
                     '''
                     STATUS = GPS['STATUS']
                     message = STATUS['message']
@@ -236,8 +294,6 @@ class main():
                     print("Disconnecting")
                 print("No Connection to {}".format(self.comport))
                 time.sleep(2)
-
-
 
 
 

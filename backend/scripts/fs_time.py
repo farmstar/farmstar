@@ -89,6 +89,9 @@ class parse():
         
 
         #Local Offset
+
+        #Unix time
+        self.SPACETIME['unix'] = time.time()
         
          
         #Calculate the fix age (time since last fix)

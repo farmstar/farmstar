@@ -1,0 +1,4 @@
+SERIAL = {'status':'',
+          'port':'',
+          'line':'',
+        }
