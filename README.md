@@ -8,6 +8,22 @@ High precision farm management system.
 ## Vision
 Help feed 10 billion people by 2050.
 
+### Farming Industry problems
+- Expensive proprietary hardware and software in machines.
+- Complicated unintuitive interfaces.
+- Seeding, spraying, harvesting inefficiencies.
+- Aging farming expertise.
+- Fully autonomous tractors are kinda expensive.
+- Some farms here in Australia are bigger than entire countries, mate.
+
+### Principles
+- High precision farming at the smallest possible cost.
+- Intuitive and simple as possible.
+- Versatile, work on anything.
+- Primarily developed for RasberyPi, or other cheap hardware.
+- Ad-hoc peer-to-peer communication.
+- Plug and play hardware, easily put in any machine.
+
 ### Components
 #### Frontend
 - Angular 6 / Node.js / Electron
@@ -18,13 +34,7 @@ Help feed 10 billion people by 2050.
 #### Communications
 - Combination WiFi Mesh and cellular
 
-### Farming Industry problems
-- Expensive proprietary hardware and software in machines.
-- Complicated unintuitive interfaces.
-- Seeding, spraying, harvesting inefficiencies.
-- Aging farming expertise.
-- Fully autonomous tractors are kinda expensive.
-- Some farms here in Australia are bigger than entire countries, mate.
+
 
 ### Screenshots-Large
 
@@ -70,13 +80,7 @@ Help feed 10 billion people by 2050.
 - Machine learning optimization of routes
 - End-to-end crop cycle management
 
-### Principles
-- High precision farming at the smallest possible cost.
-- Intuitive and simple as possible.
-- Versatile, work on anything with a screen.
-- Primarily developed for RasberyPi, or other cheap hardware.
-- Ad-hoc peer-to-peer communication.
-- Swappable hardware, easily put in any machine.
+
 
 ### Design (v2)
 - Backend written in python for data acquisition
