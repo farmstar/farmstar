@@ -1,12 +1,22 @@
 # Farmstar
 High precision farm management system.
 
-*NOTE: This is a side project, we have no idea what we are doing.*
+*NOTE: This is a side project, progress is slow.*
 
-![Logo v1.2](/docs/media/logojoy-01.2.png?raw=true)
+![Logo v1.2](/docs/media/logo-small.png?raw=true)
 
 ## Vision
-Help feed 10 billion people.
+Help feed 10 billion people by 2050.
+
+### Components
+#### Frontend
+- Angular 6 / Node.js / Electron
+#### Backend
+- Python for data acquisition
+#### Hardware
+- Raspberry Pi or other cheap SBC
+#### Communications
+- Combination WiFi Mesh and cellular
 
 ### Farming Industry problems
 - Expensive proprietary hardware and software in machines.
@@ -16,11 +26,19 @@ Help feed 10 billion people.
 - Fully autonomous tractors are kinda expensive.
 - Some farms here in Australia are bigger than entire countries, mate.
 
-### Mockup
+### Screenshots-Large
 
-*Version 1*
+*Version 2*
 
-![Mockup v1.1](/docs/media/Mockup-v1.1.jpg?raw=true)
+![Map v2](/docs/media/screenshots/map_large.PNG?raw=true)
+![Apps v2](/docs/media/screenshots/apps_large.PNG?raw=true)
+
+### Screenshots-Mobile
+
+*Version 2*
+
+![Map-mobile v2](/docs/media/screenshots/map_mobile.PNG?raw=true)
+![Apps-mobile v2](/docs/media/screenshots/apps_mobile.PNG?raw=true)
 
 ### Goals
 *See TODO / wiki / project board for specific project goals*
@@ -28,12 +46,11 @@ Help feed 10 billion people.
 #### Short Term
 - Plug and play displays
 - Simple clean interface
-- On or offline mapping
 - Basic positioning
 - Heatmap of spray area
 
 #### Medium Term
-- Peer-to-peer communication
+- Live positioning of multiple devices
 - High precision positioning
 - Mapping activities, seeding, harvesting, spraying.
 - Machine messaging
@@ -61,17 +78,14 @@ Help feed 10 billion people.
 - Ad-hoc peer-to-peer communication.
 - Swappable hardware, easily put in any machine.
 
-### Design
-- Primarily written in python
-- WebUI interface
-- Initially using django for web framework
-- Seperate backend and frontend 
-- Backend processes and logs data to sqlite
+### Design (v2)
+- Backend written in python for data acquisition
+- Frontend developed in Angular 6 / Node.js
+- Compiled into electron for standalone portability
+- Considering google firebase platform
 - Serve live position and other real-time data to simple .json http GET
-- Django frontend for local and remote WebUI
-- Leaflet mapping with custom tiles and layers.
+- Mapbox mapping
 - Primary buttons and info overlayed ontop of map
-- Boot to kiosk mode sort of thing.
 - Consideration for multiple GPS receivers, on spray booms and whatever.
 - Plug and play add on hardware such as additional sensors / IO / stereo output / additional screens / whatever
 
